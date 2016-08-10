@@ -1,0 +1,165 @@
+\documentclass[12pt,twoside,openleft]{book}
+
+\usepackage[a4paper, bindingoffset=6mm]{geometry}
+
+\usepackage[francais]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathabx}
+\usepackage{mathrsfs}
+
+\usepackage{listings}
+\usepackage{color}
+\definecolor{light-gray}{gray}{0.95}
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage[parfill]{parskip}
+
+\usepackage{pdfpages}
+
+\usepackage{tikz}
+\usepackage{tikz-uml}
+\usetikzlibrary{automata, positioning}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\chaptermark}[1]{\markboth{ #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyhead[LE,RO]{\bfseries\thepage}
+\fancyhead[RE,LO]{\bfseries\leftmark} % \leftmark = chapitre courant
+
+\newtheorem{definition}{Définition}
+\newtheorem{theorem}{Théorème}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemme}
+\newtheorem{example}{Exemple}
+
+\renewcommand{\labelitemi}{$\bullet$}
+
+\makeatletter
+\renewcommand{\ALG@name}{Algorithme}
+\renewcommand{\listalgorithmname}{Listes des \ALG@name s}
+\makeatother
+\algrenewcommand\algorithmicwhile{\textbf{tant que}}
+\algrenewcommand\algorithmicif{\textbf{si}}
+\algrenewcommand\algorithmicfor{\textbf{pour}}
+\algrenewcommand\algorithmicforall{\textbf{pour chaque}}
+\algrenewcommand\algorithmicrequire{\textbf{Entrée:}}
+\algrenewcommand\algorithmicensure{\textbf{Sortie:}}
+\algrenewcommand\algorithmicend{\textbf{fin}}
+\algrenewcommand\algorithmicdo{\textbf{faire}}
+\algrenewcommand\algorithmicelse{\textbf{sinon}}
+\algrenewcommand\algorithmicthen{\textbf{alors}}
+\algrenewcommand\algorithmicreturn{\textbf{retourner}}
+\algrenewcommand\algorithmiccomment[1]{// #1}
+\algnewcommand\algorithmicto{\textbf{à}}
+\algrenewtext{For}[3]%
+{\algorithmicfor\ #1 $\gets$ #2 \algorithmicto\ #3 \algorithmicdo}
+
+\renewcommand{\ttdefault}{pcr}
+\lstset{
+	numbers=left, 
+	numberstyle=\tiny, 
+	breaklines=true,
+	frame=single,
+	rulecolor=\color{black},
+	captionpos=b,
+	backgroundcolor=\color{white},
+	xleftmargin=\parindent,
+	tabsize=1,
+	basicstyle=\ttfamily\footnotesize,
+	literate={\ \ }{{\ }}1,
+	numbersep=5pt,
+	language=XML,
+	keywordstyle=\bfseries,
+	morekeywords={xs:element, xs:complexType, xs:sequence, attribute, xs:schema, type, name, automaton, transducer, transitions, transition, nodes, node, encoding, id, from, to, input, output, accepting, initial, xmlns:xsi, xsi:noNamespaceSchemaLocation, size, xs:attribute},
+}
+
+\usepackage[]{hyperref}
+\usepackage{xcolor}
+\hypersetup{
+	colorlinks,
+	linkcolor={red!50!black},
+	citecolor={blue!50!black},
+	urlcolor={blue!80!black}
+}
+
+\begin{document}
+	
+	\begin{titlepage}
+		\includepdf{front.pdf}
+	\end{titlepage}
+	\newpage
+	~
+	\thispagestyle{empty}
+	\newpage
+	\thispagestyle{empty}
+	\chapter*{Remerciements}
+	Je remercie ma directrice de mémoire, \emph{Véronique Bruyère}, pour son aide de par ses explications et la relecture d'une partie de mon travail. \\
+	Je tiens également à remercier mon ami, \emph{Maxime Deplasse}, pour sa relecture et ses remarques pertinentes. \\
+	Finalement, je remercie mes parents pour leur soutien.
+	\thispagestyle{empty}
+	\newpage
+	
+	\newpage\null\thispagestyle{empty}\newpage
+	
+	\thispagestyle{empty}
+	\begin{center}
+		\Large
+		\textbf{Implémentation d'algorithmes de décision pour la fonctionnalité et la sous-séquentialité de transducteurs finis.}
+		
+		\vspace{0.4cm}
+		\textbf{Hugo \textsc{Allard}}
+		
+		\vspace{0.9cm}
+		\textbf{Résumé}
+	\end{center}
+	Dans ce mémoire, nous étudions les transducteurs finis, et en particulier ceux qui réalisent des relations fonctionnelles et des fonctions sous-séquentielles. Ce sont des classes de transducteurs jouissant de bonnes propriétés de clôture et de décidabilité. Les transducteurs sous-séquentiels étant déterministes, ils sont d'un intérêt particulier pour l'implémentation. En effet, ce sont des transducteurs qui peuvent effectivement être implémentés avec une mémoire bornée. Nous voyons ensuite que la fonctionnalité et la sous-séquentialité sont elles-mêmes des propriétés décidables en temps polynomial pour les transducteurs non-déterministes, et proposons une implémentation d'algorithmes permettant de le faire. \\
+	
+	\noindent \textbf{Mots clés.} Automate fini; Transducteur fonctionnel; Transducteur sous-séquentiel; Déterminisation; Implémentation
+	
+	\newpage\null\thispagestyle{empty}\newpage
+	\pagestyle{empty}
+	\addtocontents{toc}{\protect\thispagestyle{empty}}
+	\tableofcontents
+	\cleardoublepage
+	\parindent=20pt
+	
+	\pagestyle{fancy}
+	\chapter{Introduction}
+	\setcounter{page}{1}
+	\input{chapters/introduction}
+
+	\chapter{Terminologie}
+	\input{chapters/chap1}
+
+	\chapter{Transducteurs fonctionnels}
+	\input{chapters/chap2}
+
+	\chapter{Transducteurs sous-séquentiels}
+	\input{chapters/chap3}
+
+	\chapter{Implémentation des transducteurs}
+	\input{chapters/chap4}
+	
+	\chapter{Conclusion}
+	\input{chapters/conclusion}
+
+    \newpage
+	\bibliographystyle{alpha}
+	\bibliography{bibtex/biblio}
+	
+	\appendix
+	\input{chapters/appendix}
+\end{document}

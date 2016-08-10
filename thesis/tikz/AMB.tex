@@ -1,0 +1,27 @@
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[%
+			>=stealth,
+			shorten >=1pt,
+			node distance=2.2cm,
+			on grid,
+			auto,
+			state/.append style={minimum size=2em},
+			thick
+			]
+
+		\node[state,initial,initial text={}]  (A)              {$q_0$};
+        \node[state]                                    (B) [above right of=A] {$q_1$};
+        \node[state]                                    (C) [below right of=A] {$q_2$};
+        \node[state]                                    (D) [above right of=C,accepting] {$q_3$};
+
+        \path[->]
+                (A) edge              node {$x/a$} (B)
+                    edge 			 node[swap] {$x/ab$} (C)
+                (B) edge              node {$x/bc$} (D)
+                (C) edge              node[swap] {$x/c$} (D);
+                
+\end{tikzpicture}
+	\caption{NFT ambigu mais fonctionnel}
+	\label{AMB}
+\end{figure}

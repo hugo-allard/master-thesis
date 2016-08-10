@@ -1,0 +1,28 @@
+\begin{figure}
+\centering
+\begin{tikzpicture}[%
+					>=stealth,
+					shorten >=1pt,
+					node distance=2cm,
+					on grid,
+					auto,
+					state/.append style={minimum size=2em},
+					thick
+					]
+
+		\node[state,initial,initial text={}] (A)		     {$q_0$};
+		\node[state] (B) [above right of=A] {$q_1$};
+		\node[state] (C) [below right of=A] {$q_2$};
+		\node[state,accepting] (D) [right of=B] {$q_3$};
+		\node[state,accepting] (E) [right of=C] {$q_4$};
+				
+		\path[->]
+			(A)    edge             node {$a$} 		 (B)
+			(A)    edge				node [swap] {$a$}		 (C)
+			(B)	   edge 		 node {$b$}		 (D)
+			(C)	   edge 		 node [swap] {$c$} (E);
+								
+	\end{tikzpicture}			
+	\caption{Automate non-ambigu et non-déterministe}
+	\label{NONAMB}
+\end{figure}

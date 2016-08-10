@@ -1,0 +1,37 @@
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[%
+			>=stealth,
+			shorten >=1pt,
+			node distance=3cm,
+			on grid,
+			auto,
+			state/.append style={minimum size=2em},
+			thick,
+			inner sep=.2mm,
+			]
+
+		\node[state,initial,initial text={}]         (A)                    {$(0, (\varepsilon,\varepsilon))$};
+        \node[state]                                 (B) [above right of=A] {$(1, (\varepsilon,\varepsilon))$};
+        \node[state]                                 (C) [above right of=B] {$(2, (\varepsilon,\varepsilon))$};
+        \node[state]                       			 (F) [below left of=A]  {$(3, (\varepsilon,\varepsilon))$};
+        \node[state,accepting]                       (G) [below left of=F]  {$(4, (\varepsilon,\varepsilon))$};
+        \node[state,accepting]                       (J) [above right of=C]  {$(5, (\varepsilon,\varepsilon))$};
+
+        \path[->]
+                (A) edge              node {$a/(b,b)$} (B)
+	                edge              node {$a/(ba,ba)$} (F)
+	                
+                (B) edge [bend left] node {$a/(\varepsilon,\varepsilon)$} (C)
+                (C) edge [bend left] node {$a/(\varepsilon,\varepsilon)$} (B)
+	                edge             node {$b/(ac,ac)$} (J)
+                
+                (F) edge [bend left] node {$a/(\varepsilon,\varepsilon)$} (G)
+                (G) edge [bend left] node {$a/(\varepsilon,\varepsilon)$} (F)
+                
+                (J) edge [loop above] node {$a/a$} ();
+                
+\end{tikzpicture}
+	\caption{Produit de $\mathscr{U}_1$ par l'action de retard}
+	\label{ex4}
+\end{figure}

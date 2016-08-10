@@ -1,0 +1,128 @@
+\begin{figure}
+	
+	\begin{minipage}[b]{0.5\linewidth}
+
+		\centering
+		\begin{tikzpicture}[%
+		>=stealth,
+		shorten >=1pt,
+		node distance=1.5cm,
+		on grid,
+		auto,
+		state/.append style={minimum size=1em},
+		font=\scriptsize
+		]
+		
+		\tikzstyle{smallstate}=[state, style={minimum size=0.8em},inner sep=.1mm]
+		
+		\node[state]      			(A)				 {};
+		\node[state,accepting]      						(B) [below right of=A] {};
+		\node[state,dashed]      							(E) [right of=B] {};
+		\node[state,dashed]      							(F) [below of=B] {};
+		\node[state]      									(C) [right of=F] {};
+		
+		\node[smallstate,initial,initial text={}]      			(A1) [above of=A] {};
+		\node[smallstate,accepting]      						(B1) [right of=A1] {};
+		\node[smallstate]      									(C1) [right of=B1] {};
+		
+		\node[smallstate,initial above,initial text={}]      	(A2) 	[left of=A] {};
+		\node[smallstate,accepting]      						(B2) [below of=A2] {};
+		\node[smallstate]      									(C2) [below of=B2] {};
+		
+		\path[->]
+		+(-0.7,0.7) edge (A)
+		(A) edge node [swap] {$a$} (B)
+		edge [bend left] node {$a$}  (C)
+		edge [bend left=50,dashed] node {$a$}  (E)
+		edge [bend right=50,dashed] node [swap] {$a$} (F)
+		(B) edge [bend right=10] node [swap,pos=0.8] {$a$} (C)
+		
+		(C) edge [bend right=10] node [swap,pos=0.8] {$a$} (B)
+		
+		(E) edge [bend right=10,dashed] node [swap,pos=0.8] {$a$} (F)
+		
+		(F) edge [bend right=10,dashed] node [swap,pos=0.8] {$a$} (E)
+		
+		(A1) edge node [swap] {$a$} (B1)
+		edge [bend left=50] node {$a$}  (C1)
+		
+		(B1) edge [bend right=10] node [swap] {$a$} (C1)
+		
+		(C1) edge [bend right=10] node [swap] {$a$} (B1)
+		
+		(A2) edge node {$a$} (B2)
+		edge [bend right=50] node [swap] {$a$}  (C2)
+		
+		(B2) edge [bend right=10] node [swap] {$a$} (C2)
+		
+		(C2) edge [bend right=10] node [swap] {$a$} (B2);
+		
+		\end{tikzpicture}
+		
+		\captionof*{figure}{Cas non-ambigu}
+	\end{minipage}\qquad%
+	\begin{minipage}[b]{0.5\linewidth}
+		
+		\centering
+		\begin{tikzpicture}[%
+		>=stealth,
+		shorten >=1pt,
+		node distance=1.5cm,
+		on grid,
+		auto,
+		state/.append style={minimum size=1em},
+		font=\scriptsize
+		]
+		
+		\tikzstyle{smallstate}=[state, style={minimum size=0.8em},inner sep=.1mm]
+		
+		\node[state]      			(A)				 {};
+		\node[state,accepting]      						(B) [below right of=A] {};
+		\node[state,accepting]      						(E) [right of=B] {};
+		\node[state,accepting]      						(F) [below of=B] {};
+		\node[state]      									(C) [right of=F] {};
+		
+		\node[smallstate,initial,initial text={}]      			(A1) [above of=A] {};
+		\node[smallstate,accepting]      						(B1) [right of=A1] {};
+		\node[smallstate,accepting]      						(C1) [right of=B1] {};
+		
+		\node[smallstate,initial above,initial text={}]      	(A2) 	[left of=A] {};
+		\node[smallstate,accepting]      						(B2) [below of=A2] {};
+		\node[smallstate,accepting]      						(C2) [below of=B2] {};
+		
+		\path[->]
+		+(-0.7,0.7) edge (A)
+		(A) edge node [swap] {$a$} (B)
+		edge [bend left] node {$a$}  (C)
+		edge [bend left=50] node {$a$}  (E)
+		edge [bend right=50] node [swap] {$a$} (F)
+		(B) edge [bend right=10] node [swap,pos=0.8] {$a$} (C)
+		
+		(C) edge [bend right=10] node [swap,pos=0.8] {$a$} (B)
+		
+		(E) edge [bend right=10] node [swap,pos=0.8] {$a$} (F)
+		
+		(F) edge [bend right=10] node [swap,pos=0.8] {$a$} (E)
+		
+		(A1) edge node [swap] {$a$} (B1)
+		edge [bend left=50] node {$a$}  (C1)
+		
+		(B1) edge [bend right=10] node [swap] {$a$} (C1)
+		
+		(C1) edge [bend right=10] node [swap] {$a$} (B1)
+		
+		(A2) edge node {$a$} (B2)
+		edge [bend right=50] node [swap] {$a$}  (C2)
+		
+		(B2) edge [bend right=10] node [swap] {$a$} (C2)
+		
+		(C2) edge [bend right=10] node [swap] {$a$} (B2);
+		
+		\end{tikzpicture}
+		\captionof*{figure}{Cas ambigu}
+		
+	\end{minipage}
+	
+	\caption{(\cite{Bea03}) Construction du carré émondé. En lignes discontinues, la partie non co-accessible.}
+	\label{PROD}
+\end{figure}

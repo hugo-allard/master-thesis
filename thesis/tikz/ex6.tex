@@ -1,0 +1,32 @@
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[%
+			>=stealth,
+			shorten >=1pt,
+			node distance=3cm,
+			on grid,
+			auto,
+			state/.append style={minimum size=2em},
+			thick,
+			%inner sep=.2mm,
+			]
+
+		\node[state,initial,initial text={}]         (A)                    {$(0, \varepsilon)$};
+        \node[state]                                 (B) [right of=A,align=center] {$(1,\varepsilon)$\\$(3,a)$};
+        \node[state,accepting]                                 (C) [right of=B,align=center] {$(2,\varepsilon)$\\$(4,a)$};
+        \node[state,accepting,align=center]                       (J) [right of=C] {$(5,\varepsilon)$};
+
+        \path[->]
+                (A) edge              node {$a/b$} (B)
+	                
+                (B) edge [bend left] node {$a/\varepsilon$} (C)
+                (C) edge [bend left] node {$a/\varepsilon$} (B)
+	                edge             node {$b/ac$} (J)
+	                edge			 node {$a$} +(0,-1.6)
+	                
+                (J) edge [loop above] node {$a/a$} ();
+                
+\end{tikzpicture}
+	\caption{Transducteur sous-séquentiel équivalent à $\mathscr{T}_1$}
+	\label{ex6}
+\end{figure}

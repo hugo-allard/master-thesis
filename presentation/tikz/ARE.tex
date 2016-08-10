@@ -1,0 +1,20 @@
+\begin{figure}
+		\centering
+		\begin{tikzpicture}[%
+			>=stealth,
+			shorten >=1pt,
+			node distance=3cm,
+			on grid,
+			auto,
+			state/.append style={fill=state, minimum size=2em},
+			thick
+		]
+		
+		\node[state] (AC)	{$2,6$};
+		\node[state] (BD) [right of=AC] {$3,7$};
+		
+		\path[->]
+			(AC)	edge  node {$c/(b, cba)$}	(BD);
+		
+	\end{tikzpicture}
+\end{figure}

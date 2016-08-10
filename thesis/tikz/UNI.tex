@@ -1,0 +1,26 @@
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[%
+			>=stealth,
+			shorten >=1pt,
+			node distance=3cm,
+			on grid,
+			auto,
+			state/.append style={minimum size=2em},
+			thick
+			]
+
+		\node[state,initial,initial text={}] (A)		     {$q_0$};
+		\node[state,accepting] (B) [right of=A] {$q_1$};
+				
+		\path[->]
+				(A)     edge              node {$\varepsilon / \varepsilon$} (B)
+				(A)     edge [loop above] node {$a / \varepsilon$}	  ()
+				(A)     edge [loop below] node {$b / \varepsilon$}	  ()
+				(B)     edge [loop above] node {$\varepsilon / a$}	  ()
+				(B)     edge [loop below] node {$\varepsilon / b$}	  ();
+								
+	\end{tikzpicture}
+	\caption{$\varepsilon$-NFT $\mathscr{T}_{\infty}$ sur $\Sigma = \Delta = \{a,b\}$}
+	\label{UNI}
+\end{figure}

@@ -1,0 +1,237 @@
+\label{fonctionnel}
+
+Ce chapitre présente la procédure décrite par Béal~et~al.~\cite{Bea03} pour décider la fonctionnalité d'un NFT. Cette méthode se base sur la construction du carré du transducteur de la même manière que pour décider l'ambiguïté d'un automate. Le carré du transducteur est ensuite multiplié par le semi-automate d'une action particulière et une propriété sur le transducteur résultant permet de décider la fonctionnalité. 
+
+La première section présente le produit cartésien de deux automates et décrit la procédure permettant de décider l'ambiguïté à partir du carré d'un automate. La seconde section introduit la notion d'action d'un monoïde sur un ensemble et présente une action particulière qui sera utilisée par la suite. Enfin, la troisième section décrit la procédure proposée par Béal~et~al. pour décider la fonctionnalité. L'implémentation est détaillée à la section~\ref{functionnal}.
+
+\section{Ambiguïté d'un automate}
+	
+	Soient $\mathscr{A}' = (\Sigma, Q', I', F', \delta')$ et $\mathscr{A}'' = (\Sigma, Q'', I'', F'', \delta'')$ deux automates sur $\Sigma$. Le produit cartésien de $\mathscr{A}'$ et $\mathscr{A}''$ est l'automate $\mathscr{C} = \mathscr{A}' \times \mathscr{A}'' = (\Sigma, Q'\times Q'', I' \times I'', F' \times F'', \delta_\mathscr{C})$ où $\delta_\mathscr{C}$ est la relation de transition définie comme
+	
+	\begin{quotation}
+		$\delta_\mathscr{C} = \{((p',p''), a, (q',q'')) \mid (p', a, q') \in \delta' \wedge (p'', a, q'') \in \delta''\}$.
+	\end{quotation}
+	
+	En particulier, le carré d'un automate est son produit cartésien avec lui-même. Soit $\mathscr{A}^2 = \mathscr{A} \times \mathscr{A} = (\Sigma, Q \times Q, I \times I, F \times F, \delta_{\mathscr{A}^2})$ le produit cartésien de l'automate $\mathscr{A} = (\Sigma, Q, I, F, \delta)$ avec lui-même. La relation de transition du carré est définie comme
+	
+	\begin{quotation}
+		$\delta_{\mathscr{A}^2} = \{((p,r), a, (q,s)) \mid (p, a, q), (r, a, s) \in \delta\}$.
+	\end{quotation}
+	
+	On appelle \emph{diagonale} de $\mathscr{A}\times \mathscr{A}$ le sous-automate $\mathscr{D}$ qui possède la diagonale $Q_\mathscr{D} = \{(q,q) \mid q \in Q\} \subseteq Q \times Q$ comme ensemble d'états. Les états et les transitions de $\mathscr{A}$ et $\mathscr{D}$ sont en bijection, les deux automates sont donc équivalents. \\
+	
+	\begin{lemma}[\cite{Ber85}]
+		Un automate $\mathscr{A}$ est non-ambigu si et seulement si la partie émondée de $\mathscr{A} \times \mathscr{A}$ est égale à $\mathscr{D}$ .
+	\end{lemma}
+	
+	\begin{proof}
+		Par définition, $\mathscr{A}$ est ambigu si et seulement si il existe deux chemins réussis $\rho'$ et $\rho''$ de même étiquette $f = a_1a_2\ldots a_n$ : 
+		
+		\begin{quotation}
+		$\rho' := q_0' \xrightarrow{a_1} q_1' \xrightarrow{a_2}$ \ldots $\xrightarrow{a_n} q_n'$ et $\rho'' := q_0'' \xrightarrow{a_1} q_1'' \xrightarrow{a_2}$ \ldots $\xrightarrow{a_n} q_n''$,
+		\end{quotation}
+		
+		c'est-à-dire si et seulement si il existe un chemin réussi $\rho$ dans $\mathscr{A} \times \mathscr{A}$:
+		
+		\begin{quotation}
+		$\rho := (q_0', q_0'') \xrightarrow{a_1} (q_1', q_1'') \xrightarrow{a_2}$ \ldots $\xrightarrow{a_n} (q_n', q_n'')$,
+		\end{quotation}
+		
+		dans lequel pour au moins un $i$, $0 \leq i \leq n$, on a $q_i' \neq q_i''$. Et donc si et seulement si il existe un état utile dans $\mathscr{A} \times \mathscr{A}$ qui ne soit pas dans $\mathscr{D}$.
+	\end{proof}
+	
+	\begin{proposition}
+		L'ambiguïté d'un automate fini est un problème décidable.
+	\end{proposition}
+	
+	Le déterminisme est également décidable à partir du carré de l'automate en modifiant la définition. \\
+	
+	\begin{lemma}
+		Un automate émondé $\mathscr{A}$ est déterministe si et seulement si la partie accessible de son carré $\mathscr{A} \times \mathscr{A}$ est égale à $\mathscr{D}$.
+	\end{lemma}
+	
+	La figure~\ref{PROD} illustre la construction du carré d'un automate dans le cas ambigu et le cas non-ambigu. Les transitions et les états discontinus représentent les états et transitions non co-accessibles. Dans le cas non-ambigu on a bien que la partie émondée du carré est égale à la diagonale.
+	
+	\input{tikz/PROD}
+
+\section{Produit par une action}
+	
+	\begin{definition}[Action (droite)]
+		Soient $(M, \bullet)$ un monoïde de neutre $1_M$ et $X$ un ensemble. Une action (droite) de $M$ sur $X$ est un triplet $(X, M, \phi)$ où $\phi$ est une application $\phi : X \times M \to X$ compatible avec l'opération $\bullet$ du monoïde et son neutre:
+		\begin{enumerate}
+			\item $\forall a,b \in M$ et $x \in X : \phi(\phi(x,a),b) = \phi(x, (a \bullet b))$,
+			\item $\forall x \in X, \phi(1_M, x) = x$.
+		\end{enumerate}
+	\end{definition}
+	
+	Lorsque le monoïde et l'ensemble associés à l'action sont clairs dans le contexte, il peut être fait référence à l'action par l'application seule. \\
+	Une action de $M$ sur $X$, $(X, M, \phi)$, peut alors être vue comme un automate $\mathscr{G}_\phi = (M, X, \phi)$ où $M$ est le monoïde d'où proviennent les étiquettes des transitions de $\mathscr{G}_\phi$, $X$ est l'ensemble des états de $\mathscr{G}_\phi$ et $\phi$ est la fonction de transition les reliant. Cet automate est appelé un \emph{semi-automate} car il ne comporte aucun état initial et aucun état final. Cependant, il peut parfois être intéressant de considérer un élément particulier de $X$ comme état initial. 
+	Soit $\phi_w : X \to X$ l'application définie récursivement comme:
+	
+	\begin{quotation}
+		$\begin{cases}
+			\phi_{1_M}(x) = x \\
+			\phi_a(x) = \phi_M(x,a) \text{ avec } a \in M \\
+			\phi_{aw}(x) = \phi_w(\phi_a(x)) \text{ avec } a \in M, w \in M^*
+		\end{cases}$
+	\end{quotation}
+	alors l'ensemble engendré par $\{\phi_w{x} \mid w \in M^*\}$ est clos par composition de $\phi_w$ qui est associative et admet le neutre $\phi_{1_M}$. Il forme dès lors un monoïde appelé \emph{monoïde de transition} de l'action $\phi$. Le monoïde de transition est isomorphe à $\mathbb{Z}$ lorsque $|M| = 1$ et isomorphe à $M^* \times M^*$ lorsque $|M| \geq 2$. %Bien relire !!!!!
+	
+	Il est donc possible de multiplier un automate par une action sous sa forme de semi-automate. Soient $\mathscr{A} = (M, Q, \delta, I, F)$ un automate fini émondé, $(X, M, \phi : X \times M \to X)$ une action de $M$ sur $X$ et $x_0 \in X$ un élément particulier de $X$. Alors on calcule le produit cartésien de $\mathscr{A}$ avec le semi-automate de l'action comme suit:
+	\begin{quotation}
+		$\mathscr{A} \times \mathscr{G}_\phi = (M, Q \times X, \Phi, I \times \{x_0\}, F \times X)$
+	\end{quotation}
+	avec pour ensemble de transitions
+	\begin{quotation}
+		$\Phi = \{((p,x), m, (q, \phi(x,m))) \mid x \in X \wedge (p, s, q) \in \delta\}$.
+	\end{quotation}
+	
+	L'automate $\mathscr{G}_\phi$ est souvent infini puisque l'ensemble $X$ et le monoïde $M$ sont eux-mêmes souvent infinis. On considère donc le produit d'un automate par une action, noté $\mathscr{A} \times \phi$, la partie accessible de $\mathscr{A} \times \mathscr{G}_\phi$.
+	
+	La projection sur la première composante induit une bijection entre les transitions de $\mathscr{A}$ dont l'origine est $p$ et les transitions de $\mathscr{A} \times \phi$ dont l'origine est $(p,x)$. On a par induction sur la longueur des chemins:
+	\begin{quotation}
+		$(p,x) \xrightarrow[\mathscr{A} \times \phi]{m} (q,t) \Rightarrow t = \phi(x,m)$.
+	\end{quotation}
+	
+	L'information $x \in X$ associée à chaque état de $\mathscr{A} \times \phi$ est appelée la \emph{valeur} de l'état. Lorsque la projection sur la première composante associe exactement un état de $\mathscr{A} \times \phi$ à chaque état de $\mathscr{A}$, on dit que le produit $\mathscr{A} \times \phi$ est une \emph{valuation}.
+	
+	Soit $\Delta^*$ un monoïde libre de neutre $\varepsilon$, on définit un ensemble $H_\Delta \subset \Delta^* \times \Delta^*$ qui contient les paires de $\Delta^* \times \Delta^*$ dont un des membres est le mot vide $\varepsilon$ auxquelles est adjoint un zéro noté $\mathbf{0}$ afin de le distinguer du zéro de $\mathbb{Z}$. Bien que la définition soit générale, il est ici volontairement fait référence au vocabulaire et aux notations des alphabets car c'est l'utilisation qui en sera faite.
+	
+	\begin{quotation}
+		$H_\Delta = (\Delta^* \times \varepsilon) \cup (\varepsilon \times \Delta^*) \cup \{\mathbf{0}\}$
+	\end{quotation}
+	
+	On définit une application $\psi : \Delta^* \times \Delta^* \to H_\Delta$ comme
+	
+	\begin{quotation}
+		$\forall u,v \in \Delta^* : \psi(u,v) = \begin{cases}
+			(v^{-1}u, \varepsilon) \text{ si } v \prec u \\
+			(\varepsilon, u^{-1}v) \text{ si } u \prec v \\
+			\mathbf{0} \text{ sinon}  \\
+		\end{cases}$
+	\end{quotation}
+	
+	On a donc 
+	\begin{equation}
+		\psi(u,v) = (\varepsilon, \varepsilon) \text{ si et seulement si } u = v
+		\label{eq}
+	\end{equation}
+	
+	A partir de l'application $\psi$ on définit l'\emph{action de retard} relative à $\Delta$ comme $\omega_\Delta : H_\Delta \times (\Delta^* \times \Delta^*) \to H_\Delta$ telle que
+	\begin{enumerate}
+		\item $\forall (f,g) \in H_\Delta \setminus \{\mathbf{0}\} : \omega_\Delta((f,g),(u,v)) = \psi(fu,gv)$
+		\item $\omega_\Delta(\mathbf{0}, (u,v)) = \mathbf{0}$. \\
+	\end{enumerate}
+	
+	Cette action de $(\Delta^* \times \Delta^*)$ sur $H_\Delta$ dit à quel point la première composante $u$ est en avance ou en retard sur la seconde $v$ ou si $u$ et $v$ ne sont pas préfixes d'un mot commun.
+
+\section{Décider la fonctionnalité}
+	
+	Il est également possible de définir le carré cartésien d'un transducteur. Par définition, le produit cartésien d'un transducteur $\mathscr{T} = (\mathscr{A}, \Omega)$ de $\Sigma^*$ à $\Delta^*$ avec lui-même est le transducteur $\mathscr{T} \times \mathscr{T}$ de $\Sigma^*$ à $\Delta^* \times \Delta^*$:
+	\begin{quotation}
+		$\mathscr{T} \times \mathscr{T} = (\mathscr{A}^2, \Omega \otimes \Omega)$
+	\end{quotation}
+	avec
+	\begin{quotation}
+		$\Omega$ $\otimes$ $\Omega : \delta_{\mathscr{A}^2} \to \Delta^* \times \Delta^* : ((p,r),a,(q,s)) \mapsto (\Omega(p,a,q),\Omega(r,a,s))$
+	\end{quotation}
+	où $\delta_{\mathscr{A}^2}$ est la relation de transition de $\mathscr{A} \times \mathscr{A}$ qui est l'automate sous-jacent d'entrée du carré du transducteur. Si la partie émondée de $\mathscr{A}^2$ est réduite à sa diagonale alors $\mathscr{A}$ est non-ambigu et $\mathscr{T}$ est fonctionnel.
+	
+	Il est cependant possible qu'un transducteur réalisant une transduction fonctionnelle possède un automate sous-jacent d'entrée ambigu comme celui de la figure~\ref{FONC}. Dans ce cas, il faut trouver une propriété sur les sorties nécessaire à la fonctionnalité. Dans l'exemple de la figure~\ref{FONC}, pour l'entrée $aaa$ il existe deux chemins réussis distincts \\
+	\begin{quotation}
+		$\rho' := q_0 \xrightarrow{a/x} q_1 \xrightarrow{a/x^4} q_2 \xrightarrow{a/x} q_3$
+	\end{quotation}
+	et
+	\begin{quotation}
+		$\rho'' := q_0 \xrightarrow{a/x^3} q_2 \xrightarrow{a/x} q_3 \xrightarrow{a/x^2} q_0$ \\
+	\end{quotation}
+	
+	Ce transducteur possède donc bien un automate sous-jacent d'entrée ambigu. La concaténation des étiquettes de sortie de $\rho'$ et $\rho''$ est cependant identique. Naturellement, pour que le transducteur soit fonctionnel, cela doit être le cas de tous les chemins acceptant le même mot d'entrée. Il est aisé de se convaincre de la fonctionnalité du transducteur à la figure~\ref{FONC}.
+	
+	\input{tikz/FONC}
+	
+	Pour qu'un transducteur soit fonctionnel, il est nécessaire que toute sortie finale pour une même entrée soit identique. L'intuition pour les transducteurs possédant un automate sous-jacent d'entrée ambigu est que la sortie peut être produite à une «vitesse» différente selon le chemin emprunté. Par exemple, la lecture de $a$ dans le chemin $\rho'$ produit $x$ en sortie alors que dans le chemin $\rho''$ elle produit $x^3$. Le chemin $\rho''$ est donc en avance sur $\rho'$. Ensuite, la lecture de $aa$ produit $x^5$ sur le chemin $\rho'$ et $x^4$ sur le chemin $\rho''$ qui est maintenant en retard. Enfin, après la lecture de $aaa$, les deux chemins ont produit la même sortie $x^6$. \\
+	Il est nécessaire qu'à chaque étape du calcul, une sortie produite pour une certaine entrée soit \emph{comparable} avec toutes les sorties produites sur la même entrée. Soient $u$ un mot accepté par l'automate sous-jacent d'entrée d'un transducteur fonctionnel $\mathscr{T}$, $v',v''$ deux images produites par $\mathscr{T}$ après la lecture d'un mot $u' \prec u$. On a nécessairement que $v'$ et $v''$ sont comparables, c'est-à-dire $v' \prec v''$, $v'' \prec v'$ ou $v' = v''$ et naturellement toutes les sorties pour une même entrée doivent être identiques. L'action de retard permet de vérifier cela.
+	
+	Un transducteur $\mathscr{T} \times \mathscr{T}$ de $\Sigma^*$ à $(\Delta^* \times \Delta^*)$ peut être vu comme un automate sur le monoïde $M = \Sigma^* \times (\Delta^* \times \Delta^*)$ qu'il est possible de multiplier par l'action de retard $(H_\Delta, M, \omega_\Delta)$. \\
+	
+	\begin{theorem}[\cite{Bea03}]
+		Un transducteur $\mathscr{T}$ de $\Sigma^*$ à $\Delta^*$ est fonctionnel si et seulement si le produit de la partie émondée $\mathscr{U}$ du carré cartésien $\mathscr{T} \times \mathscr{T}$ par l'action de retard $\omega_\Delta$ avec $(\varepsilon, \varepsilon)$ comme élément particulier de $H_\Delta$, est une valuation de $\mathscr{U}$ telle que la valeur de chaque état final est $(\varepsilon, \varepsilon)$.
+		\label{VAL}
+	\end{theorem}
+	\begin{proof}
+		\begin{description}
+			\item[La condition est suffisante]
+				Soient $v$ la valuation définie par le produit de $\mathscr{U}$ par $\omega_\Delta$, $\rho'$ et $\rho''$ deux chemins réussis distincts de $\mathscr{T}$:
+				\begin{quotation}
+					$\rho' := q_0' \xrightarrow{a_1/u_1'} q_1' \xrightarrow{a_2'/u_2'}$ \ldots $\xrightarrow{a_n/u_n'} q_n'$
+				\end{quotation}
+				et
+				\begin{quotation}
+					$\rho'' := q_0'' \xrightarrow{a_1/u_1''} q_1'' \xrightarrow{a_2/u_2''}$ \ldots $\xrightarrow{a_n/u_n''} q_n''$
+				\end{quotation}
+				
+				On a $v(q_0',q_0'') = (\varepsilon,\varepsilon)$ et $\omega_\Delta(v(q_0',q_0''), (u_1'$\ldots $u_i',u_1''$\ldots $u_i'')) = v(q_i',q_i'')$ pour tout $i$ et donc $\omega_\Delta(v(q_0',q_0''), (u_1'$\ldots $u_n',u_1''$\ldots $u_n'')) = v(q_n',q_n'') = (\varepsilon,\varepsilon)$ puisque $(q_n',q_n'')$ est un état final de $\mathscr{T} \times \mathscr{T}$. \\
+				De plus, par~(\ref{eq}) on a que $u_1'$\ldots$u_n' = u_1''$\ldots$u_n''$ et donc que $\mathscr{T}$ est fonctionnel.
+				
+			\item[La condition est nécessaire]
+				Deux cas sont possibles:
+				\begin{enumerate}
+					\item Le produit de $\mathscr{U}$ et $\omega_\Delta$ est une valuation mais il existe un état final $(r, r')$ de $\mathscr{U} \times \omega_\Delta$ dont la valeur diffère de $(\varepsilon, \varepsilon)$. C'est-à-dire qu'il existe un chemin réussi:
+					\begin{quotation}
+						$(i',i'') \xrightarrow[\mathscr{T} \times \mathscr{T}]{f/(u',u'')}(r',r'')$
+					\end{quotation}
+					avec
+					\begin{quotation}
+						$\omega_\Delta((\varepsilon,\varepsilon), (u',u'')) \neq (\varepsilon,\varepsilon)$.
+					\end{quotation}
+					
+					Dès lors, par~(\ref{eq}) on a $u' \neq u''$ et $\mathscr{T}$ n'est pas fonctionnel.
+					
+					\item Le produit de $\mathscr{U}$ et $\omega_\Delta$ n'est pas une valuation, c'est-à-dire qu'il existe deux chemins réussis:
+						\begin{quotation}
+							$(i',i'') \xrightarrow[\mathscr{T} \times \mathscr{T}]{f_1 / (u_1',u_1'')} (p',p'') \xrightarrow[\mathscr{T} \times \mathscr{T}]{f_2 / (u_2',u_2'')} (r',r'')$
+						\end{quotation}
+						et % Mettre la figure de Bruyere en parallèle des quotations avec u et v le milieu différent
+						\begin{quotation}
+							$(j',j'') \xrightarrow[\mathscr{T} \times \mathscr{T}]{g_1 / (v1', v_1'')} (p',p'') \xrightarrow[\mathscr{T} \times \mathscr{T}]{f_2 / (u_2',u_2'')} (r',r'')$
+						\end{quotation}
+						avec 
+						\begin{quotation}
+							$u = \omega_\Delta(\varepsilon,\varepsilon), (u_1',u_1'') \neq \omega_\Delta((\varepsilon,\varepsilon),(v_1',v_1'')) = v$.
+						\end{quotation}
+						Dès lors les deux égalités $u_1'u_2' = u_1''u_2''$ et $v_1'u_2' = u_1''v_2''$ ne peuvent être vraies en même temps donc $\mathscr{T}$ n'est pas fonctionnel.
+				\end{enumerate}
+		\end{description}
+	\end{proof}
+
+	La figure~\ref{VALUE} montre le produit du carré cartésien d'un transducteur fonctionnel $\mathscr{T}$ de $\{a\}^*$ à $\{x\}^*$ par l'action de retard et illustre le théorème~\ref{VAL}. Puisque dans ce cas $\Delta = \{x\}$ ne possède qu'une lettre, le monoïde de transition de l'action de retard est isomorphe à $\mathbb{Z}$. En effet, puisque $|\Delta| = 1$, tous les mots de $\Delta^*$ sont forcément comparables et $\mathbf{0} \not\in H_\Delta$, on peut donc considérer les applications:
+	\begin{quotation}
+		$h: H_\Delta \to \mathbb{Z} : (u,v) \mapsto \begin{cases}
+		|u| \text{ si } v = \varepsilon, \\
+		-|v| \text{ si } u = \varepsilon, \\
+		0 \text{ si } u = v = \varepsilon
+		\end{cases}$
+	\end{quotation}
+	et
+	\begin{quotation}
+		$h^{-1}: \mathbb{Z} \to H_\Delta : n \mapsto \begin{cases}
+		(x^n, \varepsilon) \text{ si } n > 0, \\
+		(\varepsilon, x^n) \text{ si } n < 0, \\
+		(\varepsilon, \varepsilon) \text{ si } n = 0 \\
+		\end{cases}$
+	\end{quotation}
+	
+	Il est aisé de se convaincre que $h$ et $h^{-1}$ sont inverse l'une de l'autre. Et soient $x \in \Delta$ et $n > m \in \mathbb{Z}$ (le cas $n < m$ est symétrique), on a bien 
+	\begin{equation*}
+		h(\omega_\Delta((x^n, \varepsilon),(\varepsilon, x^m))) = h((x^n, \varepsilon)) - h((\varepsilon, x^m)) = n-m \text{, et } h(\varepsilon,\varepsilon) = 0
+	\end{equation*}
+	ainsi que
+	\begin{equation*}
+	h^{-1}(n-m) = \omega_\Delta(h(n),h(m)) = (x^{n-m},\varepsilon) \text{, et } h^{-1}(0) = (\varepsilon,\varepsilon).
+	\end{equation*}
+	Dès lors, $h$ et $h^{-1}$ sont bien des isomorphismes et $H_\Delta$ est isomorphe à  $\mathbb{Z}$. Il est donc possible d'identifier la valeur des états et d'étiqueter les transitions du transducteur produit par $\mathbb{Z}$ plutôt que respectivement par $H_\Delta$ et $\Delta^* \times \Delta^*$. De plus, l'entrée étant toujours $a$, les transitions peuvent être représentées sans ambiguïté par leur sortie uniquement, et une sortie de la forme $(x^n,x^m)$ peut être codée comme $n-m$. Afin de ne pas surcharger d'avantage la figure, l'étiquette $n-m$ d'une transition est décrite par la nature de la flèche la représentant: en pointillés pour $0$, une simple flèche pour $1$, une grosse flèche pour $2$, une double flèche pour $3$ et des flèches discontinues pour les valeurs négatives correspondantes.
+	
+	La section~\ref{functionnal} détaille la procédure proposée par Béal~et~al. pour décider la fonctionnalité en temps polynomial~\cite{Bea03} et en propose une implémentation.
+	
+	\input{tikz/VALUE}

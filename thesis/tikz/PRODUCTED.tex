@@ -1,0 +1,53 @@
+\begin{figure}
+	\center
+	\begin{tikzpicture}
+		
+		\begin{umlpackage}[x=+8]{transducer}
+		
+			\umlclass{Transducer}{
+			}{
+			}
+		
+			\umlclass[y=+3]{TState}{
+			}{
+			}
+		
+		\end{umlpackage}
+		
+		\begin{umlpackage}[x=+8]{automata}
+
+			\umlclass[y=+6]{ATransition}{
+			}{
+			}
+		
+		\end{umlpackage}
+		
+		\begin{umlpackage}{producttransducer}
+		
+			\umlclass{ProductTransducer}{
+			}{
+				+computeV()
+			}
+				
+			\umlclass[y=+3]{ProductTState}{
+				\# subStates : Pair<TState,TState> \\
+				\# value : Pair<String,String>
+			}{
+			}
+				
+			\umlclass[y=+6]{ProductTTransition}{
+				\# output : Pair<String,String>
+			}{
+			}
+		
+		\end{umlpackage}
+		
+		\umlinherit[geometry=--]{ProductTState}{TState}
+		\umlinherit[geometry=--]{ProductTTransition}{ATransition}
+		\umlinherit[geometry=--]{ProductTransducer}{Transducer}
+			
+	\end{tikzpicture}
+		
+	\caption{Extension pour le produit de transducteurs}
+	\label{PRODUCTED}
+\end{figure}

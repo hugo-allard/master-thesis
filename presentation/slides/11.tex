@@ -1,0 +1,29 @@
+\frametitle{Transducteurs fonctionnels}
+\framesubtitle{}
+
+Décider la fonctionnalité
+	\include{tikz/FUNC}
+	
+	\centering
+	\only<2,3,4,5>{Sorties pour} %
+	\only<2>{\textcolor{green}{a}bcd :}
+	\only<3>{\textcolor{green}{ab}cd :}
+	\only<4>{\textcolor{green}{abc}d :}
+	\only<5>{\textcolor{green}{abcd} :}
+	\only<2,3,4,5>{$\begin{cases}
+		
+		\only<2>{\textcolor{blue}{d}\\}
+		\only<2>{\textcolor{blue}{d}}
+		
+		\only<3>{d\textcolor{blue}{c} \\}
+		\only<3>{d}
+	
+		\only<4>{dc\textcolor{blue}{b}\\} 
+		\only<4>{d\textcolor{blue}{cba}}
+	
+		\only<5>{dcb\textcolor{blue}{a}\\}
+		\only<5>{dcba}
+		
+	\end{cases}$}
+
+	\only<6>{A faire pour chaque paire de chemins réussis sur une même entrée!}

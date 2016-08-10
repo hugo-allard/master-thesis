@@ -1,0 +1,212 @@
+\label{sequentiel}
+
+Choffrut a présenté~\cite{Cho77} en 1977 deux caractérisations des fonctions sous-séquentielles; la première se base sur la fonction sous-séquentielle elle-même alors que la seconde se base sur une propriété d'un transducteur la réalisant. En prouvant l'équivalence de ces caractérisations, il a prouvé qu'il était décidable si un transducteur non sous-séquentiel réalise une fonction sous-séquentielle. Par la suite, Béal~et~al. ont proposé~\cite{Bea03} une nouvelle caractérisation basée sur le produit du carré cartésien du transducteur et de l'action de retard, et vérifiable en temps polynomial.
+	
+\section{Fonction uniformément divergente}
+
+	Pour rappel, la distance entre deux mots $u$ et $v$ est $||u,v|| = |u| + |v| - 2|u\wedge v|$. Dès lors, si $u = hu'$ et $v = hv'$ avec $h = u\wedge v$ on a clairement 
+	\begin{equation}
+		\label{eq2}
+		||u,v|| = |u'|+|v'| \text{.}
+	\end{equation}
+	
+	\begin{definition}
+		Une fonction partielle $f : \Sigma^* \to \Delta^*$ est \emph{uniformément divergente}\footnote{Le terme \emph{fonction à variation bornée} est aussi souvent utilisé.} si et seulement si pour tout entier $n$, il existe un entier $N$ plus grand que la distance entre les images par $f$ de deux mots dont la distance est plus petite que $n$:
+		\begin{equation*}
+		\forall n \in \mathbb{N}, \exists N \in \mathbb{N}, \forall u, v \in Dom(f) \quad ||u,v|| \leq n \Rightarrow ||f(u),f(v)|| \leq N.
+		\end{equation*}
+		C'est-à-dire que le ratio des distances entre des points et leur images doit rester borné dans le domaine de la fonction lorsque la distance devient arbitrairement grande. \\
+	\end{definition}
+
+	\begin{theorem}[\cite{Cho77}]
+		Une fonction rationnelle est sous-séquentielle si et seulement si elle est uniformément divergente. \\
+	\end{theorem}
+	
+	\begin{example}[\cite{Bea02}]
+		La relation $R = \{(u, b^n) \mid u \in \{a\}^* \wedge |u| = n \text{ est pair}\} \cup \{(u,c^n) \mid u \in \{a\}^* \wedge |u| = n \text{ est impair}\}$ réalisée par le transducteur de la figure~\ref{NONSEQ} est la fonction $f : \{a\}^* \to \{b, c\}^*$ qui associe $a^n$ à $b^n$ si $n$ est pair et $a^n$ à $c^n$ si $n$ est impair. Cette fonction n'est pas sous-séquentielle, en effet, elle n'est pas uniformément divergente puisque que pour un entier $n$ on a
+		\begin{quotation}
+			$||a^{2n}, a^{2n+1}|| = 1 \text{ alors que } ||b^{2n},c^{2n+1}|| = 4n+1$.
+		\end{quotation}
+		\label{NONSE}
+	\end{example}
+	\input{tikz/NONSEQ}
+	
+\section{Propriété de jumelage}
+
+	\begin{definition}
+		Deux mots $u$ et $v$ sont dits \emph{conjugués} s'il existe un mot $t$ tel que $ut = tv$. \\
+	\end{definition}
+	
+	La condition de jumelage est une propriété sur les états d'un transducteur et par extension, sur le transducteur entier.
+	Deux états $q$ et $q'$ d'un transducteur sont \emph{jumelés} si et seulement si pour chaque paire de chemins
+	\begin{quotation}
+		$i \xrightarrow{u/u_1} q \xrightarrow{v/v_1} q$,
+	\end{quotation}
+	\begin{quotation}
+		$i' \xrightarrow{u/u_2} q' \xrightarrow{v/v_2} q'$,
+	\end{quotation}
+	où $i$ et $i'$ sont des états initiaux, alors soit les sorties des cycles sont vides, soit la sortie d'un des chemins avant le cycle est préfixe de la sortie de l'autre chemin avant le cycle et les sorties des deux cycles sont conjuguées par le mot restant après avoir retiré le préfixe commun des $u_x$ (le préfixe commun étant la plus petite des deux sorties). Plus rigoureusement:
+	\begin{enumerate}
+		\item $v_1 = v_2 = \varepsilon$ ou
+		\item Il existe un mot fini $w$ tel que 
+		\begin{enumerate}
+			\item $u_2 = u_1w$ et $v_1w = wv_2$ ou
+			\item $u_1 = u_2w$ et $v_2w = wv_1$.
+		\end{enumerate}
+	\end{enumerate}
+
+	De plus, de $wv_2 = v_1w$ et $wv_1 = v_2w$, il vient naturellement que $|v_1| = |v_2|$. Puisque le transducteur est forcément fonctionnel, les deux chemins doivent donner la même sortie pour la même entrée, c'est-à-dire $u_1v_1^r = u_2v_2^r$. Dès lors, le cas 2 est équivalent aux deux conditions suivantes
+	\begin{enumerate}
+		\item $|v_1| = |v_2|$,
+		\item $u_1v_1^r = u_2v_2^r$.
+	\end{enumerate}
+	On dit qu'un transducteur $\mathscr{T}$ satisfait la condition de jumelage si toute paire d'états de $\mathscr{T}$ est jumelée.
+	
+	L'intuition derrière la propriété de jumelage est qu'à la lecture d'une entrée $uvw$ compatible, après $uv$, avec deux chemins $i \xrightarrow{u,u_1} q \xrightarrow{v/v_1} p$ et $i' \xrightarrow{u,u_2} q' \xrightarrow{v/v_2} p'$ il est nécessaire de stocker le retard $\omega_\Delta(u_1v_1,u_2v_2)$ jusqu'à ce que l'ambiguïté puisse être levée. C'est le cas si le mot $w$ suivant n'est compatible qu'avec un seul des deux chemins considérés. Or dans le cas d'un cycle, c'est-à-dire si $q = p$ et $q' = p'$, le retard $\omega_\Delta(u_1v_1^r,u_2v_2^r)$ peut croître avec $r$. Le retard stocké devient alors arbitrairement grand, ce qui nécessiterait une mémoire infinie. \\
+	
+	\begin{proposition}[Choffrut]
+		Soit $f : \Sigma^* \to \Delta^*$ une fonction réalisée par un transducteur $\mathscr{T}$. Les trois propositions suivantes sont équivalentes:
+		\begin{itemize}
+			\item La fonction $f$ est sous-séquentielle.
+			\item La fonction $f$ est uniformément divergente.
+			\item $\mathscr{T}$ satisfait la condition de jumelage. \\
+		\end{itemize}
+	\end{proposition}
+	
+	\begin{example}
+		Il est maintenant possible de montrer que le NFT de la figure~\ref{NONDET} ne réalise pas une fonction sous-séquentielle et qu'il n'est donc pas déterminisable. En effet, il y a deux chemins
+		\begin{quotation}
+			$q_0 \xrightarrow{x/a} q_1 \xrightarrow{yy/ba} q_1$,
+		\end{quotation}
+		\begin{quotation}
+			$q_0 \xrightarrow{x/b} q_2 \xrightarrow{yy/ba} q_2$,
+		\end{quotation}
+		et bien qu'on ait $|ba| = |ba|$, clairement $a(ba)^r \neq b(ba)^r$. Le transducteur ne satisfait pas la condition de jumelage et la fonction qu'il réalise n'est donc pas sous-séquentielle.
+	\end{example}
+	
+\section{Décider la sous-séquentialité}
+    
+    Plus récemment, Béal~et~al. ont présenté~\cite{Bea03} une procédure de décision pour la sous-séquentialité basée sur le produit du carré du transducteur par l'action de retard. Cette caractérisation des transducteurs sous-séquentiels est très proche de la première formulation de la condition de jumelage. \\
+    
+    \begin{theorem}[\cite{Bea03}]
+    	\label{ss}
+    	Un transducteur fonctionnel émondé $\mathscr{T} = (\mathscr{A} = (\Sigma,Q,I,F,\delta), \Omega:\delta\to\Delta^*)$ réalise une transduction sous-séquentielle si et seulement si le produit de la partie accessible $\mathscr{V}$ de $\mathscr{T} \times \mathscr{T}$ par $\omega_\Delta$ a les deux propriétés suivantes:
+    	\begin{enumerate}
+    		\item Il est fini
+    		\item Si un état a la valeur $\mathbf{0}$ dans $\mathscr{V} \times \omega_\Delta$ appartient à un cycle de $\mathscr{V}$, alors l'étiquette de ce cycle est $(\varepsilon,\varepsilon)$.
+    	\end{enumerate}
+    \end{theorem}
+    
+    \input{tikz/EXSUBSEQ}
+    
+	La figure~\ref{EXSUBSEQ} montre deux cas où la fonction réalisée par les transducteurs est sous-séquentielle. Dans le cas (a), la fonction est sous-séquentielle car le produit est fini et aucun état possède la valeur $\mathbf{0}$. D'ailleurs la valeur est identifiée par $\mathbb{Z}$ puisque l'alphabet de sortie ne contient qu'un seul symbole. Dans le cas (b), la partie accessible du produit est également finie et la valeur $\mathbf{0}$ n'apparaît que dans des états appartenant à un cycle d'étiquette $(\varepsilon,\varepsilon)$.
+	
+	\input{tikz/EXNONSUBSEQ}
+	    
+	La figure~\ref{EXNONSUBSEQ} montre quant à elle deux cas où la fonction réalisée par les transducteurs n'est pas sous-séquentielle. Dans le cas (a) car la partie accessible du produit est infinie. Dans le cas (b) car il existe dans la partie accessible du produit deux états de valeur $\mathbf{0}$ appartenant à un cycle qui est étiqueté par $(x^2,x^2) \neq (\varepsilon,\varepsilon)$.
+    
+    Le lemme suivant est nécessaire pour prouver le théorème~\ref{ss}. Il permet une reformulation de la condition de jumelage grâce à l'action de retard. \\
+    
+    \begin{lemma}[\cite{Bea03}]
+    	\label{lem}
+    	Soient $(\varepsilon,w) \in H_\Delta \backslash \mathbf{0}$ et $(v_1,v_2) \in \Delta^* \times \Delta^* \backslash (\varepsilon,\varepsilon)$. Alors l'ensemble $X = \{\omega_\Delta((\varepsilon,w), (v_1,v_2)^r) \mid r \in \mathbb{N} \}$ est fini et ne contient pas $\mathbf{0}$ si et seulement si $v_1$ et $v_2$ sont conjugués par un mot $t$ et $w = v_1^kt$ pour un certain $k$. Si cette condition est vérifiée, $X$ est un singleton.
+    \end{lemma}
+    \begin{proof}
+    	Si la condition est vérifiée, on a
+    	\begin{align*}
+    	\omega_\Delta((\varepsilon,z),(v_1,v_2)) &= (\varepsilon,v_1^{-1}(wv_2)) \\
+										     &= (\varepsilon,v_1^{-1}(v_1^ktv_2)) &\text{ car } w = v_1^kt \\
+										     &= (\varepsilon,v_1^{k-1}tv_2) \\
+										     &= (\varepsilon,v_1^{k-1}v_1t) &\text{ car } v_1t = tv_2 \\
+										     &= (\varepsilon,w) &\text{ car } v_1^{k-1}v_1t = v_1^kt = w \\
+    	\end{align*}
+    	
+    	A l'inverse, si $\mathbf{0} \not\in X$, c'est-à-dire que $\omega_\Delta((\varepsilon,w),(v_1,v_2)^r) \neq \mathbf{0}$, alors on est forcément dans un des cas suivants:
+    	\begin{enumerate}
+    		\item $u = \varepsilon$; ou
+    		\item $v = \varepsilon$ et $w$ est préfixe d'une puissance de $u$; ou
+    		% RELIRE ET MODIFIER !!!!!!!!!!!!!!!!!
+    		\item $w$ est préfixe d'une puissance de $v_1$, c'est-à-dire $w = v_1^kt$ où $t$ est un préfixe de $v_1$, et il doit exister un $l$ tel que $v_1^k$ est conjugué à $v_2^l$ par $t$.
+    	\end{enumerate}
+    	Il est clair que pour que $X$ soit un singleton, il suffit de prendre $k=l$.
+    \end{proof}
+    
+    La preuve du théorème~\ref{ss} donnée par Béal~et~al.~\cite{Bea03} est présentée ici. Il suffit de prouver que les conditions du théorème~\ref{ss} sont vérifiées si et seulement si la fonction $f$ réalisée par un transducteur $\mathscr{T}$ est uniformément divergente.
+    
+    \begin{proof}[Démonstration du théorème~\ref{ss}]
+	    \textbf{Les conditions sont suffisantes}. Soient $K$ une borne sur la longueur des sorties de $\mathscr{T}$ et $L$ une borne sur la longueur des valeurs des états dans le produit $\mathscr{V} \times \omega_\Delta$.
+	    Soient $m,n \in Dom(f)$, on pose $h = m \wedge n$ donc $m = hm'$ et $n = hn'$. Il existe deux chemins réussis dans $\mathscr{T}$
+	    \begin{quotation}
+	    	$i \xrightarrow{h/u} p \xrightarrow{m'/u'} t$ et $j \xrightarrow{h/v} q \xrightarrow{n'/v'} s$.
+	    \end{quotation}
+	    Dès lors, il existe un chemin
+	    \begin{quotation}
+	    	$(i,j) \xrightarrow{h/(u,v)} (p,q)$
+	    \end{quotation}
+	    dans $\mathscr{V}$. Deux cas sont alors possibles:
+	    \begin{description}
+	    	\item[Cas 1:] $\omega_\Delta((\varepsilon,\varepsilon),(u,v)) \neq \mathbf{0}$, alors
+	    	\begin{align*}
+		    	||f(m),f(n)|| &= ||uu',vv'|| \\
+						      &= |uu'| + |vv'| - 2|uu' \wedge vv'| \\
+						      &= (|u| + |v| - 2|uu' \wedge vv'|) + |u'| + |v'| \\
+						      &\leq L + |u'| + |v'| \\
+						      &\leq L + K(|m'|+|n'|) \\
+						      &= L+K||m,n|| & \text{ par~(\ref{eq2})}
+	    	\end{align*}
+	    	Dans ce cas, $f$ est bien uniformément divergente puisque $L$ et $K$ sont des constantes.
+	    	\item[Cas 2:] $\omega_\Delta((\varepsilon,\varepsilon),(u,v)) = \mathbf{0}$, alors $u$ et $v$ ne sont pas comparables mais il est possible de décomposer $h=h_1ah_2h_3$ avec $a \in \Sigma$ et $h_1,h_2,h_3 \in \Sigma^*$ de telle sorte que la première partie des sorties soit comparable. Le chemin $(i,j) \xrightarrow{h/(u,v)} (p,q)$ devient alors
+	    	\begin{equation*}
+	    		(i,j) \xrightarrow{h_1/(u_1,v_1)} (p_1,q_1) \xrightarrow{a/(x,y)} (p_2,q_2) \xrightarrow{h_2/(\varepsilon,\varepsilon)} (p_3,q_3) \xrightarrow{h_3/(u_2,v_2)} (p,q),
+	    	\end{equation*}
+	    	où la valeur de $(p_1,q_1)$ est différente de $\mathbf{0}$, la valeur de $(p_2,q_2)$ est égale à $\mathbf{0}$ et $(u_2,v_2)$ est différent de $(\varepsilon,\varepsilon)$ si $h_3$ est différent de $\varepsilon$. Comme chaque état après $(p_2,q_2)$ a une valeur de $\mathbf{0}$ et que par hypothèse la condition est vérifiée, le chemin
+	    	\begin{quotation}
+	    		$(p_3,q_3) \xrightarrow{h_3/(u_2,v_2)} (p,q)$
+	    	\end{quotation}
+	    	ne peut pas contenir de cycle et sa longueur est donc bornée par le nombre d'états $|Q|^2$. On a alors
+	    	\begin{align*}
+	    		||f(m),f(n)|| &= ||u_1xu_2u',v_1yv_2v'|| \\
+					    	  &\leq L + (|u_2|+|v_2|) + (|u'| + |v'|) \\
+					    	  &\leq L + K(|Q|^2 + 1) + K(|m'| + |n'|) \\
+					    	  &= L + K(|Q|^2 + 1) + K||m,n|| & \text{ par~(\ref{eq2})}
+	    	\end{align*}
+	    	Dans ce cas également la fonction $f$ est uniformément divergente. Les conditions sont donc bien suffisantes.
+	    \end{description}
+	    \textbf{Les conditions sont nécessaires}. Deux cas sont possibles:
+	    \begin{description}
+	    	\item[Cas 1:] il existe un cycle dans $\mathscr{V} \times \omega_\Delta$ dont tous les états ont la valeur $\mathbf{0}$ et dont l'étiquette est différente de $(\varepsilon,\varepsilon)$. Dans $\mathscr{V}$, il y a un chemin
+	    	\begin{quotation}
+	    		$(i,j) \xrightarrow{h_1/(u_1,v_1)} (p,q) \xrightarrow{h_2/(u_2,v_2)} (p,q)$
+	    	\end{quotation}
+	    	tel que $\omega_\Delta((\varepsilon,\varepsilon),(u_1,v_1)) = \mathbf{0}$. Ce qui implique pour la distance
+	    	\begin{align*}
+		    	||f(h_1h_2^rm'),f(h_1h_2^rn')|| &= ||u_1u_2^ru',v_1v_2^r,v'|| \\
+										    	&\geq r(|u_2|+|v_2|) + |u'| + |v'|
+	    	\end{align*}
+	    	peut être rendue arbitrairement grande avec $r$. Dans ce cas, $f$ n'est pas uniformément divergente.
+	    	
+	    	\item[Cas 2:] le produit $\mathscr{V} \times \omega_\Delta$ est infini. Il existe donc au moins un chemin dans $\mathscr{V}$
+	    	\begin{quotation}
+	    		$(i,j) \xrightarrow{h_1/(u_1,v_1)} (p,q) \xrightarrow{h_2/(u_2,v_2)} (p,q)$
+	    	\end{quotation}
+	    	qui devient un graphe infini dans $\mathscr{V} \times \omega_\Delta$. C'est-à-dire que \begin{quotation}
+	    		$\omega_\Delta((\varepsilon,\varepsilon),(u_1,v_1)) = (x,y) \neq \mathbf{0}$
+	    	\end{quotation}
+	    	et 
+	    	\begin{quotation}
+		    	$\forall r \in \mathbb{N}$ $\omega_\Delta((x,y),(u_2,v_2)^r) \neq \mathbf{0}$.
+		    \end{quotation}
+		    Grâce au lemme~\ref{lem} on a que $|u_2| \neq |v_2|$ et il existe un $l$ tel que 
+	    	\begin{quotation}
+	    		$|\omega_\Delta((x,y),(u_2,v_2)^r)| \geq (r-l)|(|u_2|-|v_2|)$
+	    	\end{quotation}
+	    	et donc
+	    	\begin{align*}
+	    		||f(h_1h_2^rm'),f(h_1h_2^rn')|| &= ||u_1u_2^ru',v_1v_2^rv'|| \\
+									    		&\geq \left[(r-l)|(|u_2|-|v_2|)|\right] - |(|u'|-|v'|)|
+	    	\end{align*}
+	    	qui peut être rendu arbitrairement grand. Dans ce cas, $f$ n'est pas uniformément divergente. Les conditions sont donc bien nécessaires.
+	    \end{description}
+    \end{proof}
+    
+    La section~\ref{subsequential} détaille la procédure proposée par Béal~et~al. pour décider la sous-séquentialité en temps polynomial~\cite{Bea03} et en propose une implémentation. La section~\ref{determinize} donne également une procédure exponentielle pour déterminiser un transducteur réalisant une fonction sous-séquentielle, c'est-à-dire créer un transducteur sous-séquentiel équivalent.

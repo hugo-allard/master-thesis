@@ -1,0 +1,43 @@
+\frametitle{Transducteurs sous-séquentiels}
+\framesubtitle{}
+
+\begin{block}{Définition (Condition de jumelage)}
+	Un transducteur vérifie la condition de jumelage si pour toute situation
+	
+	\begin{figure}
+		\centering
+		\begin{tikzpicture}[%
+		>=stealth,
+		shorten >=1pt,
+		node distance=1.5cm,
+		on grid,
+		auto,
+		state/.append style={fill=state, minimum size=1.5em, inner sep=2pt},
+		thick,
+		every text node part/.style={align=center},
+		font=\scriptsize
+		]
+		
+		\node[state,initial,initial text={}]  (A) {$q_0$};
+		\node[state]             (B) [above right of=A] {$p$};
+		\node[state]            (C) [below right of=A] {$q$};
+				\node[state]             (E) [right of=B] {$p$};
+				\node[state]            (F) [right of=C] {$q$};
+		
+		\path[->]
+		(A) edge [decorate,decoration={snake}]  node {$u_1/v_1$} (B)
+			edge [decorate,decoration={snake}]  node [swap]  {$u_1/w_1$} (C)
+		
+		(B) edge [decorate,decoration={snake}]  node {$u_2/v_2$} (E)
+		
+		(C) edge [decorate,decoration={snake}]  node {$u_2/w_2$} (F);
+		
+		\end{tikzpicture}
+	\end{figure}
+	
+	On a $delay(v_1,w) = delay(v_1v_2,w_1w_2)$.
+\end{block}
+
+\begin{block}{Théorème (Choffrut, 1977)}
+	Un transducteur est sous-séquentialisable si et seulement si il vérifie la condition de jumelage.
+\end{block}

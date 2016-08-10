@@ -1,0 +1,150 @@
+\documentclass{beamer}
+
+\beamertemplatenavigationsymbolsempty
+
+\colorlet{red}{red!60!black}
+\colorlet{green}{green!60!black}
+\xdefinecolor{state}{RGB}{255, 244, 141}
+
+\usepackage[francais]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathabx}
+\usepackage{mathrsfs}
+
+\usepackage{tikz}
+\usetikzlibrary{automata, positioning}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{decorations.markings}
+
+\tikzset{onslide/.code args={<#1>#2}{%
+		\only<#1>{\pgfkeysalso{#2}}
+	}}
+
+\title[Algorithmes pour les transducteurs finis]{Implémentation d'algorithmes de décision pour la fonctionnalité et la sous-séquentialité de transducteurs finis}
+\author{Hugo \textsc{Allard}}
+\institute[Umons]{Université de Mons}
+\date{07/09/2015}
+
+\usetheme{Madrid}
+
+\begin{document}
+	
+	\begin{frame}
+		\titlepage
+	\end{frame}
+	
+	\AtBeginSection[]
+	{
+		\begin{frame}
+			\frametitle{Sommaire}
+			\tableofcontents[currentsection, hideothersubsections]
+		\end{frame} 
+	}
+	
+	\section{Automates finis}
+		\begin{frame}
+			\input{slides/1}
+		\end{frame}
+		
+		\begin{frame}
+			\input{slides/2}
+		\end{frame}
+		
+		\begin{frame}
+			\input{slides/3}
+		\end{frame}
+		
+	\section{Transducteurs finis}
+	
+		\begin{frame}
+			\input{slides/4}
+		\end{frame}
+		
+		\begin{frame}
+			\input{slides/5}
+		\end{frame}
+		
+		\begin{frame}
+			\input{slides/6}
+		\end{frame}
+		
+		\begin{frame}
+			\input{slides/7}
+		\end{frame}
+	
+	\section{Transducteurs fonctionnels}
+
+		\begin{frame}
+			\input{slides/8}
+		\end{frame}
+	
+		\begin{frame}
+			\input{slides/9}
+		\end{frame}
+		
+		\begin{frame}
+			\input{slides/10}
+		\end{frame}
+		
+		\begin{frame}
+			\input{slides/11}
+		\end{frame}
+		
+		\begin{frame}
+			\input{slides/12}
+		\end{frame}
+		
+		\begin{frame}
+			\input{slides/13}
+		\end{frame}
+		
+		\begin{frame}
+			\input{slides/14}
+		\end{frame}
+		
+		\begin{frame}
+			\input{slides/15}
+		\end{frame}
+		
+		\begin{frame}
+			\input{slides/16}
+		\end{frame}
+		
+	\section{Transducteurs sous-séquentiels}
+	
+		\begin{frame}
+			\input{slides/17}
+		\end{frame}
+		
+		\begin{frame}
+			\input{slides/18}
+		\end{frame}
+		
+		\begin{frame}
+			\input{slides/19}
+		\end{frame}
+		
+		\begin{frame}
+			\input{slides/20}
+		\end{frame}
+		
+		\begin{frame}
+			\input{slides/21}
+		\end{frame}
+	
+	\section{Conclusion}
+	
+		\begin{frame}
+			\input{slides/22}
+		\end{frame}
+		
+		\begin{frame}
+			\input{slides/23}
+		\end{frame}
+
+\end{document}

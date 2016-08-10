@@ -1,0 +1,17 @@
+\frametitle{Transducteurs fonctionnels}
+\framesubtitle{}
+
+\begin{block}{Définition}
+	Une transduction $R \subseteq \Sigma^* \to \Delta^*$ est fonctionnelle si pour tout mot $u \in \Sigma^*$ il existe au plus un mot $v \in \Delta^*$ tel que $(u,v) \in R.$
+\end{block}
+
+\begin{itemize}
+	\item Un transducteur est fonctionnel si il réalise une transduction fonctionnelle.
+	\item Un DFT est forcément fonctionnel.
+	\item Un NFT peut être fonctionnel.
+\end{itemize}
+
+\pause
+\begin{block}{Théorème}
+	L'inclusion et l'équivalence pour un NFT fonctionnel sont PSpace-C.
+\end{block}

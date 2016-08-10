@@ -1,0 +1,25 @@
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[%
+	>=stealth,
+	shorten >=1pt,
+	node distance=3cm,
+	on grid,
+	auto,
+	state/.append style={fill=state, minimum size=1.5em},
+	thick,
+	]
+	
+	\node[state,initial,initial text={}, accepting]         (A)                    {$q_0$};
+	\node[state]                       (B) [right of=A] {$q_1$};
+	
+	\path[->]
+	(A) edge [bend left]  node {$a/a$} (B)
+		edge [loop above] node {$b/\varepsilon$} ()
+	(B) edge [bend left]  node {$a/a$} (A)
+		edge [loop above] node {$b/\varepsilon$} ();
+	
+	\end{tikzpicture}
+	
+	\label{DFT}
+\end{figure}

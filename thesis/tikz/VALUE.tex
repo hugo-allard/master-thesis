@@ -1,0 +1,121 @@
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[%
+	>=stealth,
+	shorten >=1pt,
+	node distance=2.2cm,
+	on grid,
+	auto,
+	state/.append style={minimum size=2em}
+	]
+	
+	\tikzstyle{smallstate}=[state, style={minimum size=1em}]
+	
+	\node[state,accepting]      (A)              {0};
+	\node[state]                                 		(B) [right of=A] {-1};
+	\node[state]                                		(C) [right of=B] {1};
+	\node[state,initial right,initial text={},accepting] (D) [right of=C] {0};
+	
+	\node[state]      									(E) [below of=A] {1};
+	\node[state]                                 		(F) [right of=E] {0};
+	\node[state]                                		(G) [right of=F] {2};
+	\node[state]      									(H) [right of=G] {1};
+	
+	\node[state]      									(I) [below of=E] {-1};
+	\node[state]                                 		(J) [right of=I] {-2};
+	\node[state]                                		(K) [right of=J] {0};
+	\node[state]      									(L) [right of=K] {-1};
+	
+	\node[state,initial,initial text={},accepting]      (M) [below of=I] {0};
+	\node[state]                                 		(N) [right of=M] {-1};
+	\node[state]                                		(O) [right of=N] {1};
+	\node[state,initial right,initial text={},accepting]      (P) [right of=O] {0};
+	
+	\node[smallstate,initial,initial text={},accepting] (A1) [above=2.5cm of A] {};
+	\node[smallstate]									(B1) [above=2.5cm of B] {};
+	\node[smallstate]									(C1) [above=2.5cm of C] {};
+	\node[smallstate,initial right,initial text={},accepting] (D1) [above=2.5cm of D] {};
+	
+	\node[smallstate,initial above,initial text={},accepting] (A2) [left=2.5cm of A] {};
+	\node[smallstate] 									(E2) [left=2.5cm of E] {};
+	\node[smallstate] 									(I2) [left=2.5cm of I] {};
+	\node[smallstate,initial,initial text={},accepting] (M2) [left=2.5cm of M] {};
+	
+	\path[->]
+	+(-0.7,0.7) edge (A)
+	(A) edge [thick] (G)
+		edge [dotted]  (F)
+		edge [bend right=12,dotted]  (K)
+		edge [thick, dashed]  (J)
+		
+	(B) edge [thick] (H)
+		edge  (K)
+		edge [bend left=35,dotted]  (L)
+		edge [double]  (G)
+		
+	(C) edge [dotted]  (H)
+		edge [thick,dashed]  (L)
+		
+	(D) edge  (E)
+		edge [dashed]  (I)
+		
+	(E) edge [thick,dashed] (N)
+		edge [dashed] (K)
+		edge [bend right=30,dotted]  (O)
+		edge [double,dashed]  (J)
+		
+	(F) edge (O)
+		edge [bend left=30,dotted] (P)
+		edge [dotted]  (K)
+		edge [dashed]  (L)
+		
+	(G) edge [thick,dashed]  (P)
+		edge [double,dashed]  (L)
+		
+	(H) edge [thick,dashed]  (I)
+		edge [dashed]  (M)
+		
+	(I) edge [thick]  (O)
+		edge [dotted]  (N)
+		
+	(J) edge [thick]  (P)
+		edge [double]  (O)
+		
+	(K) edge [dotted]  (P)
+	
+	(L) edge   (M)
+	
+	(M) edge [dashed]  (B)
+		edge   (C)
+		
+	(N) edge [thick]  (C)
+		edge   (D)
+		
+	(O) edge [dashed]  (D)
+	
+	(P) edge [bend left=22,dotted]  (A)
+	
+	(A1) edge node [swap] {$a/x$} (B1)
+		 edge [bend left] node [pos=0.8] {$a/x^3$} (C1)
+		 
+	(B1) edge node [swap] {$a/x^4$} (C1)
+		 edge [bend right = 45] node [swap] {$a/x^3$} (D1)
+		 
+	(C1) edge node {$a/x$} (D1)
+	
+	(D1) edge [bend right=40] node [swap] {$a/x^2$} (A1)
+	
+	(A2) edge node {$a/x$} (E2)
+	edge [bend right] node [swap,pos=0.8] {$a/x^3$} (I2)
+	
+	(E2) edge node {$a/x^4$} (I2)
+	edge [bend left=65] node [pos=0.4] {$a/x^3$} (M2)
+	
+	(I2) edge node {$a/x$} (M2)
+	
+	(M2) edge [bend left=50] node {$a/x^2$} (A2);
+	
+	\end{tikzpicture}
+	\caption{(\cite{Bea03}) Produit du carré cartésien du transducteur de la figure~\ref{FONC} par l'action de retard $\omega_\Delta$}
+	\label{VALUE}
+\end{figure}

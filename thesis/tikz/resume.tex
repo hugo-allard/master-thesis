@@ -1,0 +1,26 @@
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[%
+			>=stealth,
+			shorten >=1pt,
+			node distance=2cm,
+			on grid,
+			auto,
+			state/.append style={minimum size=2em},
+			thick
+			]
+
+		\node      (A)              {DFT};
+        \node      (B) [right of=A] {$\subset$};
+        \node      (C) [right of=B] {fNFT};
+        \node      (D) [right of=C] {$\subset$};
+        \node      (E) [right of=D] {NFT};
+        
+        \path[]
+                (C) edge [bend right=45] node [swap] {PTime} node {?} (A)
+                (E) edge [bend right=45] node [swap] {PTime} node {?} (C);
+                
+\end{tikzpicture}
+	\caption{}
+	\label{resume}
+\end{figure}

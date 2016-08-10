@@ -1,0 +1,558 @@
+\label{implementation}
+
+Ce chapitre détaille l'implémentation des transducteurs et des algorithmes introduits aux chapitres~\ref{fonctionnel} et~\ref{sequentiel}. La section~\ref{struct} présente les structures de données utilisées, c'est-à-dire comment les modèles d'automates et transducteurs sont représentés en mémoire principale. La manière dont ils sont représentés en mémoire secondaire est discutée à la section~\ref{format}. Les sections suivantes sont respectivement consacrées aux procédures d'émondage, de carré de transducteur, de décision de la fonctionnalité et de la sous-séquentialité, et de déterminisation.
+
+Ce chapitre s'articule autour des différentes étapes d'un programme, fourni avec le code source en annexe~\ref{code}, qui prend en entrée un transducteur, teste sa fonctionnalité, sa sous-séquentialité et produit un automate sous-séquentiel équivalent le cas échéant. Il est régulièrement fait référence au transducteur $\mathscr{T}_1$ de la figure~\ref{ex1} afin d'illustrer le travail du programme à chaque étape.
+
+Afin de rendre les pseudo-codes de ce chapitre plus lisibles, l'accès à une variable d'une instance peut se faire grâce au point ($.$) plutôt que par l'appel à une méthode «getter». Ainsi $t_a.dest.id$ est équivalent à $t_a.getDestination().getId()$ et fait référence à l'identifiant du nœud destination de la transition $t_a$.
+
+\input{ex1}
+
+\section{Structures de données}
+\label{struct}
+
+	L'implémentation des transducteurs est ici proposée en JAVA car il s'agit d'un langage de programmation populaire et portable. De plus, le paradigme orienté objet  permet facilement de représenter les relations entre les modèles (comme l'automate sous-jacent d'un transducteur par exemple) et autorise également via l'héritage une extensibilité aisée. Le polymorphisme est aussi très utile pour la généralisation des procédures. Nous décrivons ici les structures de données visibles dans le diagramme de classe à la figure~\ref{CLASS1}, la classe \textbf{State} étant trop grande pour la figure, elle est détaillée à la figure~\ref{CLASS2}. Les méthodes de type «getters» et «setters» sont volontairement omises par soucis de clarté.
+	
+	\input{tikz/class1}
+	\input{tikz/class2}
+	
+	La structure de base des automates et des transducteurs présentés ici est un graphe orienté.
+	\begin{description}
+		\item[Graph] Le graphe est composé d'un tableau $states$\footnote{$states$ étant l'implémentation de $Q$, $states$ et $Q$ feront référence à la même structure dans les algorithmes} contenant tous les nœuds du graphe et d'un entier $size$ qui est la taille de ce tableau, c'est-à-dire le nombre de nœuds du graphe. Il possède également une méthode $addState$ prenant un nœud en paramètre et le plaçant dans le tableau $states$ à la bonne place.
+		\item[State] Un nœud est caractérisé par un $id \in [0, size[$ unique (au sein du graphe) qui donne la place du nœud dans le tableau $states$ du graphe auquel il appartient, tout en servant de discriminant. Un nœud possède également deux listes de transitions pour ses transitions entrantes et sortantes. Un entier $mark$ permettant de marquer un état comme non-exploré, en cours d'exploration ou totalement exploré.
+		\item[Transition] Les transitions du graphe sont caractérisées par leur origine et leur destination.  \\
+	\end{description}
+	
+	Un automate étant un graphe dont certains nœuds (maintenant appelés états) peuvent être initiaux et/ou finaux et dont les transitions sont étiquetées par des symboles. Cela est concrétisé par l'héritage de graph à automata\footnote{Le terme Automata fait ici référence au package complet}.
+	\begin{description}
+		\item[Automaton] Un automate hérite des graphes le tableau d'états. Il possède également une méthode $trim()$ qui émonde l'automate.
+		\item[AState] Un état d'automate peut être initial et/ou final, il possède donc deux variables booléennes à cet effet. Les champs d'instance $accessible$ et $coaccessible$ sont évidents et servent lors de l'émondage détaillé à la section~\ref{emondage}.
+		\item[ATransition] Les transitions d'un automate héritent leur origine et leur destination de celles du graphe et leur ajoutent une chaîne de caractère $input$ représentant l'entrée de la transition. \\
+	\end{description}
+	
+	Un transducteur possède un automate sous-jacent d'entrée dont les étiquettes sont «augmentées» d'une sortie. Cela est également concrétisé par l'héritage de automata à transducer.
+	\begin{description}
+		\item[Transducer] Un transducteur hérite de l'automate le tableau d'états et la méthode d'émondage tout en ajoutant une méthode $square()$ retournant le carré cartésien du transducteur détaillée à la section~\ref{carré}, une méthode $isFunctionnal()$ décidant la fonctionnalité du transducteur et détaillée à la section~\ref{functionnal}, une méthode $isSubsequential()$ décidant la sous-séquentialité et détaillée à la section~\ref{subsequential} et une méthode $determinize()$ qui retourne un transducteur sous-séquentiel équivalent et détaillée à la section~\ref{determinize}.
+		\item[TState] Un état d'un transducteur peut produire une sortie, c'est le cas pour un transducteur sous-séquentiel, il possède donc une chaîne de caractère $output$ à cet effet.
+		\item[TTransition] Les transitions d'un transducteur héritent leur origine, leur destination et leur entrée de celles de l'automate et leur ajoutent une chaîne de caractère $output$ représentant la sortie de la transition. \\
+	\end{description}
+	
+\section{Format de fichiers}
+\label{format}
+
+	Cette section détaille la manière dont les modèles d'automates et de transducteurs sont représentés en mémoire secondaire, c'est-à-dire le format de fichier contenant toutes les informations nécessaires à la description du modèle.
+	
+	Le XML est choisi comme langage de description car il est facilement lisible par un être humain tout en étant très bien supporté par les langages de programmations dont le JAVA avec l'implémentation de l'API SAX. De plus, la nature extensible de XML permet à ce format d'évoluer en fonction des besoins et des modèles à décrire. Ainsi, un modèle basé sur un graphe aura une structure telle que présentée au listing~\ref{ex2} et devra être compatible avec le schéma XML présenté en annexe~\ref{schema}. Le schéma XML vérifie la syntaxe du fichier d'entrée, il est bien sûr nécessaire qu'il ait également du sens au niveau sémantique. Ainsi, les nœuds doivent avoir un $id$ compris entre $0$ et $size$, le nombre de nœuds dans la balise $<nodes>$ doit être égal à l'attribut $size$ de la structure et les attributs $from$ et $to$ des transitions doivent faire référence à des nœuds.
+
+	\begin{lstlisting}[caption={Fichier XML pour l'exemple de la figure~\ref{ex1}}, label={ex2}]
+<?xml version="1.0" encoding="UTF-8"?>
+
+<transducer size="6" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:noNamespaceSchemaLocation="schema.xsd">
+
+	<nodes>
+		<node id="0" initial="true" />
+		<node id="1" />
+		<node id="2" />
+		<node id="3" />
+		<node id="4" accepting="true" />
+		<node id="5" accepting="true" />
+	</nodes>
+
+	<transitions>
+		<transition from="0" to="1" input="a" output="b" />
+		<transition from="0" to="3" input="a" output="ba" />
+		<transition from="1" to="2" input="a" output="" />
+		<transition from="2" to="1" input="a" output="" />
+		<transition from="2" to="5" input="b" output="ac" />
+		<transition from="3" to="4" input="a" output="" />
+		<transition from="4" to="3" input="a" output="" />
+		<transition from="5" to="5" input="a" output="a" />
+	</transitions>
+</transducer>
+	\end{lstlisting}
+	
+\section{\'{E}mondage}
+\label{emondage}
+
+	L'algorithme pour l'émondage d'un automate est assez trivial; il consiste en une lecture du graphe de l'automate depuis les états initiaux afin de marquer les états accessibles et une lecture inverse depuis les états finaux afin de marquer les états co-accessibles. Les états utiles sont alors les états qui ont été marqués lors des deux parcours. Une possibilité aurait été de créer un automate émondé équivalent lors du second parcours en copiant les états utiles et les transitions entre ces états. Cependant, puisque cette méthode implique une copie des états et des transitions, elle dépend de l'entrée sur laquelle l'algorithme est appliqué et il est nécessaire de redéfinir l'émondage pour les automates, les produits d'automates sur $\Delta^*$, sur $(\Delta^* \times \Delta^*)$ (comme c'est le cas pour le carré des automates ou les transducteurs), sur $\Sigma^* \times (\Delta^* \times \Delta^*)$ (comme c'est le cas pour le carré des transducteurs) ou sur toute extension impliquant une modification des structures de données. \\
+	Puisque par définition l'émondage ne dépend que du sens des transitions et pas de l'étiquette de celles-ci, il est préférable de définir l'émondage pour les automates de manière suffisamment générale pour que l'algorithme soit applicable à tous les modèles possédant un automate sous-jacent, quelque soit le monoïde sur lequel il travaille. La procédure transforme donc l'objet sur laquelle elle est appliquée en supprimant les états et transitions non utiles. La structure en graphe étant commune à tous les modèles héritant des automates, cette procédure est générale. Cette généralisation vient donc au prix d'un calcul supplémentaire peu coûteux.
+	
+	L'algorithme~\ref{trim} détaille la procédure présentée ici. Le pseudo-code étant assez long, il est divisé en deux parties logiques.
+	
+	\begin{algorithm}
+		\caption{\'{E}mondage d'un automate - Lecture des états utiles}
+		\label{trim}
+		\begin{algorithmic}[1]
+			\Require calcul sur $\mathscr{A} = (\Sigma,Q,I,F,\delta)$
+			\Ensure $-$ $\mathscr{A}$ est émondé
+			
+			\Statex
+			\Statex
+			\Comment{Lecture des états accessibles}
+			\State Soit $P$ une pile
+			\ForAll{état $s$ de $\mathscr{A}$}
+				\If{$s$ est initial}
+					\State $P.empiler(s)$
+				\EndIf
+			\EndFor
+			\Statex
+			\While{$P$ non vide}
+				\State $courant \gets P.depiler()$
+				\State Marquer $courant$ comme accessible
+				\ForAll{Transition sortante $t$ de $courant$}
+					\If{$t.dest$ non accessible}
+						\State $P.empiler(t.dest)$
+					\EndIf
+				\EndFor
+			\EndWhile
+			
+			\Statex
+			\Statex
+			\Comment{Lecture des états co-accessibles}
+			\ForAll{état $s$ de $\mathscr{A}$}
+				\If{$s$ est final}
+					\State $P.empiler(s)$
+				\EndIf
+			\EndFor
+			\Statex
+			\State Soit $utiles$ un compteur
+			\While{$P$ non vide}
+				\State $courant \gets P.depiler()$
+				\State Marquer $courant$ comme co-accessible
+				\If{$courant$ n'a pas encore été compté}
+					\State $utiles \gets utiles + 1$
+				\EndIf
+				\ForAll{Transition entrante $t$ de $courant$}
+					\If{$t.origin$ non co-accessible}
+						\State $P.empiler(t.origin)$
+					\EndIf
+				\EndFor
+			\EndWhile
+			
+			\algstore{trim}
+			
+		\end{algorithmic}
+	\end{algorithm}
+	
+	La première partie se divise également en deux étapes. La première effectue un parcours en profondeur afin de marquer tous les états accessibles. Tous les états et toutes les transitions sont donc visités et, pour un automate $\mathscr{A} = (\Sigma, Q, I, F, \delta)$, la complexité en temps dans le pire des cas, c'est-à-dire lorsque tous les états sont accessibles, est $O(|Q| + |\delta|)$.
+	
+	\setcounter{algorithm}{0}
+	
+	La seconde étape est un nouveau parcours en profondeur, inverse cette fois, qui permet de marquer les états co-accessibles parmi les états accessibles. Ce parcours inverse est rendu possible grâce au stockage des transitions entrantes. Les états ainsi marqués sont les états utiles et un compteur est utilisé pour comptabiliser leur nombre.
+	La complexité en temps de cette partie est également $O(|Q| + |\delta|)$.
+	
+	\begin{algorithm}
+		\caption{\'{E}mondage d'un automate - Suppression des états et transitions inutiles}
+		\begin{algorithmic}[1]
+						
+			\algrestore{trim}
+			
+			\Statex
+			\State Créer un tableau $usefulStates$ de taille $utiles$ \Comment{$Q'$}
+			\State Soit $j$ un compteur
+			\ForAll{état $s$ de $\mathscr{A}$}
+				\If{$s$ est utile}
+					\State $s.id \gets j$
+					\State $usefulStates[j] \gets s$
+					\State $j \gets j + 1$
+				\EndIf
+			\EndFor
+			\ForAll{état $s$ dans $usefulStates$}
+				\ForAll{Transition entrante $t$ de $s$}
+					\If{$t.origin$ non utile}
+						\State supprimer $t$
+					\EndIf
+				\EndFor
+				\ForAll{Transition sortante $t$ de $s$}
+					\If{$t.dest$ non utile}
+						\State supprimer $t$
+					\EndIf
+				\EndFor
+			\EndFor
+			\State Remplacer les état de $\mathscr{A}$ par $usefulStates$
+		\end{algorithmic}
+	\end{algorithm}
+
+	Cette dernière partie est le calcul supplémentaire engendré par la généralisation. Un nouveau tableau $Q'$ est créé pour stocker les états utiles. Ce tableau est rempli en parcourant $Q$ et en copiant la référence de chaque état utile dans $Q'$ (l'$id$ des états est mis à jour pour correspondre à leur nouvelle position). La complexité est donc toujours $O(|Q|)$. \\
+	Ensuite, les transitions de chaque états de $Q'$ sont parcourues et une transition est supprimée si elle ne mène pas à un état utile. Dans le pire des cas, c'est-à-dire que l'automate est déjà émondé, tous les états et transitions sont parcourus, cette étape revient à un nouveau parcours complet de l'automate, donc en $O(|Q| + |\delta|)$.
+	
+	Au total, l'émondage est bien linéaire en la taille de l'automate d'entrée.
+	
+\section{Carré}
+\label{carré}
+
+	Pour rappel, le carré cartésien d'un transducteur $\mathscr{T} = (\mathscr{A}, \Omega)$ de $\Sigma^*$ à $\Delta^*$ est le transducteur $\mathscr{T} \times \mathscr{T}$ de $\Sigma^*$ à $\Delta^* \times \Delta^*$:
+	\begin{quotation}
+		$\mathscr{T} \times \mathscr{T} = (\mathscr{A}^2, \Omega \otimes \Omega)$
+	\end{quotation}
+	avec
+	\begin{quotation}
+		$\Omega$ $\otimes$ $\Omega : \delta_{\mathscr{A}^2} \to \Delta^* \times \Delta^* : ((p,r),a,(q,s)) \mapsto (\Omega(p,a,q),\Omega(r,a,s))$
+	\end{quotation}
+	où $\delta_{\mathscr{A}^2}$ est la relation de transition de $\mathscr{A} \times \mathscr{A}$ qui est l'automate sous-jacent d'entrée du carré du transducteur.
+	
+	Il convient donc d'introduire de nouvelles structures pour supporter les nouveaux états de $\mathscr{T}^2$ composés d'une paire d'états et les nouvelles transitions dont la sortie est étiquetées dans $\Delta^* \times \Delta^*$. La figure~\ref{PRODUCTED} montre comment les structures de données de base sont étendues pour représenter le produit de transducteurs. Une \emph{transition produite} hérite des transitions d'automates tout en leur ajoutant une sortie dans $\Delta^* \times \Delta^*$. Un \emph{état produit} de $\mathscr{T}^2$ contient une paire d'états de $\mathscr{T}$ et une variable $valeur$ permettant de simuler le produit par $\omega_\Delta$, l'état produit est initial,resp. final, si et seulement si les deux états de la paire sont initiaux, resp. finaux. Un \emph{transducteur produit} possède une méthode \emph{computeV()} qui calcule le sous-automate $\mathscr{V'}$ tel que décrit à la section~\ref{subsequential}.
+	
+	Il existe une bijection entre les paires d'états de $\mathscr{T}$ et les états de $\mathscr{T}^2$. Il est donc possible d'identifier sans ambiguïté un état de $\mathscr{T}^2$ grâce à ses deux sous-états. Pour ce faire, les états du transducteur produit sont stockés dans un tableau de taille $|Q|^2$ de telle sorte que l'état $(q_i,q_j)$ se trouve à l'index donné par la fonction de hachage:
+	\begin{quotation}
+		$hash(i, j) = i \times |Q| + j$. \\
+	\end{quotation}
+	
+	Le pseudo-code pour le calcul du carré d'un transducteur est donné par l'algorithme~\ref{square}. La figure~\ref{ex3} montre le carré du transducteur de la figure~\ref{ex1}. Seule la partie accessible nous intéresse par la suite et seule cette partie est représentée sur la figure. La partie accessible mais non co-accessible est en traits discontinus. Il est intéressant de noter que la partie émondée du carré est égale à la diagonale du carré. Ce qui prouve que l'automate sous-jacent est non-ambigu et que le transducteur est fonctionnel.
+	
+	\input{tikz/ex3}
+	
+	\input{tikz/PRODUCTED}
+
+	\begin{algorithm}
+		\caption{Calcul du carré d'un transducteur}
+		\label{square}
+		\begin{algorithmic}[1]
+			\Require $\mathscr{T} = (\mathscr{A} = (\Sigma,Q,I,F,\delta), \Omega)$
+			\Ensure $\mathscr{T} \times \mathscr{T}$
+			
+			\Statex
+			\State $output \leftarrow new$ Transducer($|Q|^2$)
+			\Statex
+			\Statex
+			\Comment{Calcul de $Q \times Q$}
+			\For{$i$}{$1$}{$|Q|$}
+				\For{$j$}{$1$}{$|Q|$}
+					\State $newID \leftarrow$ $hash(states[i].id, states[j].id)$
+					\State $output.addState(new State(newID, states[i], states[j]))$
+				\EndFor
+			\EndFor
+			\Statex
+			\Statex
+			\Comment{Calcul des transitions}
+			\For{$i$}{$1$}{$|Q|^2$}
+				\State $origin \leftarrow output.getState(i)$
+				\ForAll{Transition sortante $t_a$ de $a$}
+					\ForAll{Transition sortante $t_b$ de $b$}
+						\If{$t_a.input = t_b.input$}
+							\State $destId = hash(t_a.dest.id, t_b.dest.id)$
+							\State $dest \leftarrow output.getState(destId)$
+							\State Créer une transition $origin \xrightarrow{t_a.input / (t_a.output, t_b.output)} dest$
+						\EndIf
+					\EndFor
+				\EndFor
+			\EndFor
+			\Statex
+			\Return $output$
+		\end{algorithmic}
+	\end{algorithm}
+	
+	Le calcul des états de $\mathscr{T}^2$ se fait trivialement en $O(|Q|^2)$. Pour le calcul des transitions de $\mathscr{T}^2$, à chaque transition, on considère toutes les autres transitions donc la complexité est $O(|\delta|^2)$. Au total, le calcul du carré de fait en $O(|Q|^2 + |\delta|^2)$.
+	
+\section{Fonctionnalité}
+\label{functionnal}
+
+	Cette section présente l'algorithme proposé par Béal~et~al.~\cite{Bea03}  pour tester la fonctionnalité d'un NFT. Cet algorithme est basé sur le théorème~\ref{VAL} et est donc une preuve du théorème~\ref{SCH}.
+
+	La multiplication par l'action $\omega_\Delta$ est implémentée grâce à la variable $value$ de la classe \textbf{ProductTState} qui sert à stocker la valeur des états de $\mathscr{U} \times \omega_\Delta$. Dans un premier temps, il est nécessaire de calculer $\mathscr{U}$, la partie émondée de $\mathscr{T} \times \mathscr{T}$. Tous les états initiaux de $\mathscr{U}$ reçoivent $(\varepsilon,\varepsilon)$ comme valeur. Ensuite, un parcours en profondeur est effectué et lorsqu'une transition $((p',p''),(u,v),(q',q''))$ où l'état $(p',p'')$ a la valeur $(f,g)$ est considérée, il y a trois cas possibles:
+
+	\begin{enumerate}
+		\item Si $(q',q'')$ n'a pas encore été visité, alors on lui assigne la valeur $\omega_\Delta((f,g),(u,v))$.
+		\item Si $(q',q'')$ a déjà été visité et sa valeur est différente de $\omega_\Delta((f,g),(u,v))$, alors l'algorithme s'arrête car $\mathscr{U} \times \omega_\Delta$ n'est pas une valuation de $\mathscr{U}$. Si $(q',q'')$ est final alors sa valeur doit être égale à $(\varepsilon,\varepsilon)$ sinon $\mathscr{T}$ n'est pas fonctionnel et l'algorithme s'arrête.
+		\item Si $(q',q'')$ a déjà été visité et que sa valeur est égale à $\omega_\Delta((f,g),(u,v))$, alors l'algorithme continue et considère une autre transition jusqu'à ce que le point 2 soit rencontré ou que toutes les transitions aient été considérées.
+	\end{enumerate}
+	
+	Dans  le cas où toutes les transitions ont été considérées, on a donc que $\mathscr{U} \times \omega_\Delta$ est une valuation et chaque état final a la valeur $(\varepsilon,\varepsilon)$, $\mathscr{T}$ est donc fonctionnel.
+	
+	Pour rappel, la taille d'un automate est définie par $|Q| + |\delta|$. La taille d'une transition $p \xrightarrow{u/v}q$ d'un transducteur est la longueur de $|uv|$. On note $K$ la taille de la plus longue transition. La somme de la taille de toutes les transitions de $\mathscr{T}$ est notée $\lceil \mathscr{T} \rceil$ et est bornée par $K|\delta|$. Le calcul du carré se fait en $O(|Q|^2 + |\delta|^2)$ et son émondage $\mathscr{U}$ est linéaire en sa taille donc également $O(|Q|^2 + |\delta|^2)$. Puisque chaque transition du carré possède deux mots de sortie, $\lceil \mathscr{U} \rceil$ est borné par $2K|\delta|^2$. Le calcul de la valeur d'un état de $\mathscr{U} \times \omega_\Delta$ peut être borné par $\lceil \mathscr{U} \rceil$.
+	
+	La complexité totale est donc $O((|Q|^2 + |\delta|^2) \times \lceil \mathscr{U} \rceil)$.
+	
+	La figure~\ref{ex4} montre le produit de la partie émondée $\mathscr{U}_1$ du carré de la figure~\ref{ex3} par l'action de retard. Les états ont été renommés par de simples lettres pour plus de lisibilité. Ainsi, l'état $(5, (\varepsilon,\varepsilon))$ est l'état $(q_5,q_5)$ possédant la valeur $(\varepsilon,\varepsilon)$. Trivialement, le produit est bien une valuation et les états finaux ont bien la valeur $(\varepsilon,\varepsilon)$.
+	
+	\input{tikz/ex4}
+	
+	\begin{algorithm}
+		\caption{Teste la fonctionnalité d'un transducteur}
+		\label{algofunc}
+		\begin{algorithmic}[1]
+			\Require calcul sur $\mathscr{T} = (\mathscr{A},\Omega)$
+			\Ensure \textbf{vrai} si $\mathscr{T}$ est fonctionne, \textbf{faux} sinon
+			
+			\Statex
+			\State $\mathscr{U} = \mathscr{T} \times \mathscr{T}$
+			\State $\mathscr{U}.trim()$
+			\State Soit $P$ une pile
+			\ForAll{état $s$ de $\mathscr{U}$}
+				\If{$s$ est final}
+					\State Marquer $s$
+					\State Donner la valeur $(\varepsilon,\varepsilon)$ à $s$
+					\State $P.empiler(s)$
+				\EndIf
+			\EndFor
+			\Statex
+			\While{$P$ non vide}
+				\State $courant \gets P.depiler()$
+				\ForAll{Transition sortante $t$ de $courant$}
+					\State Soit $valeur$ une paire de mots
+					\State $valeur \gets courant.getValue() + t.output$
+					\State Retirer le $lcp$ des deux composantes de $valeur$
+					\State $suivant \gets t.destination$
+					\If{$suivant$ pas encore marqué}
+						\State Marquer $suivant$
+						\State $suivant.setValue(valeur)$
+						\State $P.empiler(suivant)$
+					\ElsIf{$suivant.value \neq valeur$}
+						\State \Return \textbf{faux}
+					\ElsIf{$(suivant$ est final \textbf{et} $ suivant.value \neq (\varepsilon,\varepsilon)$}
+						\State \Return \textbf{faux}
+					\EndIf
+					
+					\Return \textbf{vrai}
+				\EndFor
+			\EndWhile		
+		\end{algorithmic}
+	\end{algorithm}
+	
+\section{Sous-séquentialité}
+\label{subsequential}
+
+		Cette section présente l'algorithme proposé par Béal~et~al.~\cite{Bea03}  pour tester la sous-séquentialité d'un NFT fonctionnel.
+		
+		Soient $\mathscr{T} = (\mathscr{A} = (\Sigma, Q, I, F, \delta), \Omega: \delta \to \Delta^*)$ un transducteur et $K$ la taille de la plus longue transition de $\mathscr{T}$. Le calcul de la partie accessible $\mathscr{V}$ de $\mathscr{T} \times \mathscr{T}$ se fait de la même manière que le premier parcours dans l'émonde, donc en $O(|Q| + |\delta|)$. Cependant, seule une partie de $\mathscr{V}$ est intéressante pour l'algorithme. En effet, au vu des conditions énoncées dans le théorème~\ref{ss}, on voit qu'il est possible de se limiter aux états qui sont co-accessibles à un cycle dont l'étiquette est différente de $(\varepsilon,\varepsilon)$. En effet, un cycle étiqueté par $(\varepsilon,\varepsilon)$ ne permet pas de faire croître arbitrairement le retard devant être stocké avant de lever l'ambiguïté, ce qui est l'intuition qui permet de caractériser les transducteurs non-déterminisables.
+		
+		Soit $\mathscr{V'}$ le sous-automate de $\mathscr{V}$ qui ne contient que les états co-accessibles à un cycle dont la sortie est différente de $(\varepsilon,\varepsilon)$. Le calcul de $\mathscr{V'}$ se fait grâce à un parcours en profondeur dans lequel on stocke pour chaque état la sortie produite jusque-là. Un état est marqué comme en cours d'exploration quand il a déjà été visité mais que tous ses successeurs n'ont pas encore été visités. Lorsque le parcours rencontre un état en cours d'exploration, un cycle est détecté et la différence entre la sortie produite lors de la première visite et la sortie produite lors de la seconde visite (après le cycle) permet de vérifier si le cycle est étiqueté par $(\varepsilon,\varepsilon)$. Lorsqu'un cycle non-vide est détecté, l'état est marqué comme co-accessible. Une fois le parcours en profondeur terminé, un second parcours, inverse et à partir des états marqués comme co-accessibles, est effectué pour marquer tous les états accessibles qui sont également co-accessibles à un cycle non-vide. Deux parcours en profondeur sont effectués et dans le pire des cas, la procédure est linéaire en la taille du carré: $O(|Q|^2 + |\delta|^2)$. \\
+		
+		La figure~\ref{ex5} montre le calcul de $\mathscr{V'}$ pour $\mathscr{T}_1 \times \mathscr{T}_1$. Le seul cycle non-vide dans la partie accessible du carré est celui de l'état $5$. Les états co-accessibles à un cycle non-vide sont donc les états $0,1,2,5$.\\
+		
+		\input{tikz/ex5}
+		
+		\begin{lemma}[\cite{Bea03}]
+			Si $((p,q),(\varepsilon,w))$ et $((p,q),(\varepsilon,w'))$ sont deux états de $\mathscr{V'} \times \omega_\Delta$ alors $w$ et $w'$ sont comparables ou la condition 2 du théorème~\ref{ss} n'est pas respectée.
+			\label{lem2}
+		\end{lemma}
+		\begin{proof}
+			Puisque $(p,q)$ est dans $\mathscr{V'}$, il est co-accessible à un état $(r,s)$ appartenant à un cycle étiqueté par $(u,v) \neq (\varepsilon,\varepsilon)$, c'est-à-dire qu'il existe un chemin $(p,q) \xrightarrow{f/(x,y)} (r,s)$ dans $\mathscr{V'}$. Si $w$ et $w'$ ne sont pas comparables, alors au moins un des ensembles \begin{quotation}
+				$X = \{\omega_\Delta(\omega_\Delta((\varepsilon, w),(x,y)),(u,v)^n) \mid n \in \mathbb{N} \}$
+			\end{quotation}
+			et
+			\begin{quotation}
+			$X' = \{\omega_\Delta(\omega_\Delta((\varepsilon, w'),(x,y)),(u,v)^n) \mid n \in \mathbb{N} \}$
+			\end{quotation}
+			contient $\mathbf{0}$ et l'état $((r,s),\mathbf{0})$ est dans $\mathscr{V'} \times \omega_\Delta$ \\
+		\end{proof}
+		
+		\begin{lemma}[\cite{Bea03}]
+			Si $((p,q),(\varepsilon,w))$ est un état de $\mathscr{V'} \times \omega_\Delta$ alors $|w| \leq K|Q|^2$ ou les conditions du théorème~\ref{ss} ne sont pas respectées.
+			\label{lem3}
+		\end{lemma}
+		\begin{proof}
+			Le plus court chemin d'un état initial $((i,j),(\varepsilon,\varepsilon))$ à un état $((p,q),(\varepsilon,w))$ dans $\mathscr{V'} \times \omega_\Delta$ a une longueur inférieure à $|Q|^2$. Sinon, il contient obligatoirement un cycle et il est possible de le décomposer en
+			\begin{equation*}
+				((i,j),(\varepsilon,\varepsilon)) \xrightarrow{f_1/(u_1,v_1)} ((r,s),h_1) \xrightarrow{f_2/(u_2,v_2)} ((r,s),h_2) \xrightarrow{f_3/(u_3,v_3)} ((p,q),(\varepsilon,w))
+			\end{equation*}.
+			Par le lemme~\ref{lem}, l'ensemble $X = \{\omega_\Delta(h_1,(u_2,v_2)^n) \mid n \in \mathbb{N}\}$ doit être un singleton et donc $h_1 = h_2$, il existe donc un chemin plus court.
+			
+			Dès lors, la longueur de $w$ est bornée par $K|Q|^2$. \\
+		\end{proof}
+		
+		Contrairement à l'algorithme de décision pour la fonctionnalité, on ne s'intéresse pas à la partie émondée mais à la partie accessible de $\mathscr{T} \times \mathscr{T}$, de plus, il n'est plus nécessaire que le produit par l'action de retard $\omega_\Delta$ soit une valuation. Il faut donc stocker plusieurs valeurs pour chaque état mais il suffit de stocker la valeur la plus longue\footnote{Comprendre $w$ le plus long.} de la forme $(\varepsilon, w)$ et la valeur la plus longue de la forme $(w, \varepsilon)$. En effet, dans la figure~\ref{EXSUBSEQ}(a), les quatre états non co-accessibles sont en fait deux états de $\mathscr{V}$ qui reçoivent chacun deux valeurs ($-1$ et $1$) lors du produit par l'action de retard et entre lesquels il y a un cycle qui ne fait pas croître ces valeurs. De la même manière, les boucles infinies de la figure~\ref{EXNONSUBSEQ}(a) sont chacune un état pour lequel le produit par l'action de retard associe plusieurs valeurs, de plus en plus grandes.
+		
+		Le calcul de $\mathscr{V'} \times \omega_\Delta$ se fait donc à l'aide de deux tableaux $T_1$ et $T_2$ indexés par $|Q|^2$ et stockant respectivement pour chaque état le $w$ de la valeur la plus longue $(\varepsilon, w)$ et de la valeur la plus longue de la forme $(w, \varepsilon)$. Pour chaque transition $(p,q) \xrightarrow{a/(u,v)} (p',q')$ de $\mathscr{V'}$, on calcule $h' = \omega_\Delta(T_1[(p,q)],(u,v))$, resp. $h' = \omega_\Delta(T_2[(p,q)],(u,v))$:
+		
+		\begin{enumerate}
+			\item Si $h' = \mathbf{0}$ alors la condition 2 du théorème~\ref{ss} n'est pas vérifiée et l'algorithme s'arrête.
+			\item Si $h'$ est de la forme $(\varepsilon,w)$, resp. $(w,\varepsilon)$, alors on regarde si $w$ et $T_1[p',q']$, resp. $T_2[p',q']$, sont comparables. Vient alors deux possibilités:
+			\begin{enumerate}
+				\item S'ils ne sont pas comparables, alors le lemme~\ref{lem2} dit que les conditions du théorème~\ref{ss} ne sont pas satisfaites et l'algorithme s'arrête.
+				\item S'ils sont comparables, alors on met à jour $T_1[p',q']$, resp. $T_2[p',q']$, avec le plus long des deux mots.
+			\end{enumerate}
+			\item Si $h' = T_1[p',q']$, resp. $T_2[p',q']$ alors le cycle n'a pas fait évolué la valeur de $(p',q')$ et il n'est pas nécessaire de continuer le parcours à partir de cet état puisqu'il a déjà été fait.
+			\item Si $h' = (\varepsilon, w)$, resp. $(w, \varepsilon)$, et que $|w| > K|Q|^2$ alors le lemme~\ref{lem3} dit que les conditions du théorème~\ref{ss} ne sont pas satisfaites et l'algorithme s'arrête.
+		\end{enumerate}
+		
+		L'algorithme s'arrête toujours, soit parce qu'une condition d'arrêt est rencontrée et que $\mathscr{T}$ n'est pas sous-séquentiel, soit parce que tous les états de $\mathscr{V'}$ ont été visités et qu'aucun cycle ne fait croître la valeur des états qui le forment, dans ce cas $\mathscr{T}$ est sous-séquentiel.
+		
+		L'algorithme effectue donc un parcours complet de $\mathscr{V'}$ et peut même visiter un état plusieurs fois si sa valeur croît. Le nombre total d'états visités est donc borné par $2|Q|^2 \times K|Q|^2 = 2K|Q|^4$, c'est-à-dire deux tableaux de taille $|Q|^2$ dont les éléments peuvent être mis à jour au plus $K|Q|^2$ fois. Le nombre total de transitions visitées est borné par $|\delta|^2 \times 2K|Q|^2$, c'est-à-dire toutes les transitions de $\mathscr{V'}$ (au pire $|\delta|^2$) pour lesquelles on peut calculer au plus $2K|Q|^2$ mises à jour de valeur. Puisque vérifier si deux mots sont comparables est borné par $K|Q|^2$, le temps total pour la procédure peut être borné par $2K|Q|^4|\delta|^2$.
+		
+		L'algorithme~\ref{algoSS} montre le pseudo-code pour cette procédure. On peut également voir dans la figure~\ref{ex4} en ne gardant que les états de $\mathscr{V'}$ que $\mathscr{T}_1$ réalise bien une transduction sous-séquentielle.
+		
+		\begin{algorithm}
+			\caption{Teste la sous-séquentialité d'un transducteur}
+			\label{algoSS}
+			\begin{algorithmic}[1]
+				\Require calcul sur $\mathscr{T} = (\mathscr{A},\Omega)$
+				\Ensure \textbf{vrai} si $\mathscr{T}$ est sous-séquentiel, \textbf{faux} sinon
+				
+				\Statex
+				\State Soit $P$ une pile
+				\State Calculer $\mathscr{T^2}$
+				\State Calculer $\mathscr{V'}$ à partir de $\mathscr{T^2}$
+				\ForAll{état $s$ de $\mathscr{V'}$}
+					\If{$s$ est initial}
+						\State Ajoute $s$ à $P$
+					\EndIf
+				\EndFor
+				\Statex
+				\While{$P$ non vide}
+					\State $courant \gets P.depiler()$
+					\State marquer $courant$ comme exploré
+					\ForAll{transition sortante $t$ de $courant$}
+						\State $suivant \gets t.dest$
+						\If{$suivant$ est marqué comme co-accessible\footnote{Co-accessible à un cycle non vide}}
+							\State $valeur \gets \omega_\Delta(T_1[courant], t.output)$
+							\If{$valeur = \mathbf{0}$ \textbf{ou} $valeur > K|Q|^2$}
+								\State \Return \textbf{faux}
+							\ElsIf{$suivant$ est non exploré}
+								\State Stocker $valeur$ dans $T_1[suivant]$ ou $T_2[suivant]$
+								\State $P.empiler(suivant)$
+							\ElsIf{$suivant$ est déjà exploré}
+								\If{$\omega_\Delta(T_1[suivant], valeur) = \mathbf{0}$}
+									\State \Return \textbf{faux}
+								\EndIf
+								\If{$\omega_\Delta(T_2[suivant], valeur) = \mathbf{0}$}
+									\State \Return \textbf{faux}
+								\EndIf
+								\State $T_1[suivant] \gets Max(T_1[suivant], valeur)$
+								\If{le cycle a fait croître $T_1[suivant]$}
+									\State $P.empiler(suivant)$
+								\EndIf
+							\EndIf
+						\EndIf
+					\EndFor	
+				\EndWhile
+			\end{algorithmic}
+		\end{algorithm}
+		
+\section{Déterminisation}
+\label{determinize}
+
+	Cette section présente la procédure de déterminisation proposée par Béal~et~Carton~\cite{Bea02}. Cette procédure s'applique bien sûr aux transducteurs réalisant une fonction sous-séquentielle.
+	
+	Soit $\mathscr{T} = (\mathscr{A} = (\Sigma, Q, I, F, \delta), \Omega : \delta \to \Delta^*)$ un transducteur temps réel réalisant une fonction sous-séquentielle $f$. L'algorithme qui suit produit un transducteur sous-séquentiel réalisant $f$, il est exponentiel en les états de $\mathscr{T}$, ce qui n'est pas surprenant puisque la déterminisation d'un automate est déjà exponentielle.
+	
+	On définit un transducteur sous-séquentiel $\mathscr{D} = (\mathscr{T'}, \Omega_f)$ comme suit: un état $P$ de $\mathscr{D}$ est un ensemble de paires $(q,w)$ avec $q \in Q$ un état de $\mathscr{T}$ et $w \in \Delta^*$ un mot sur l'alphabet de sortie. Soit $a \in \Sigma$ un symbole sur l'alphabet d'entrée, la paire $(P, a)$ détermine un ensemble de paires $Q \times \Delta^*$:
+	\begin{quotation}
+		$R = \{(q',wu) \mid \exists (q,w) \in P \wedge q \xrightarrow{a/u} q' \in \delta \}$.
+	\end{quotation}
+	Si $R$ est vide, alors il n'y a pas de transitions sortant de $P$ avec l'entrée $a$. Si $R$ est non-vide, alors on pose $v$ comme le plus long préfixe commun des mots $wu$ pour $(q',wu) \in R$ et on crée un état $P'$ dans $\mathscr{D}$ tel que
+	\begin{quotation}
+		$P' = \{(q',w') \mid (q',vw') \in R \}$.
+	\end{quotation}
+	On crée alors une transition $P \xrightarrow{a/v} P'$ dans $\mathscr{D}$. L'unique état initial de $\mathscr{D}$ est l'ensemble $J = \{(i,\varepsilon) | i \in I\}$ où $I$ est l'ensemble des états initiaux de $\mathscr{T}$. Le lemme suivant caractérise rigoureusement les transitions de $\mathscr{D}$. \\
+	
+	\begin{lemma}[\cite{Bea02}]
+		\label{lem4}
+		Soient $u \in Sigma^*$ un mot fini et $J \xrightarrow{u/v} P$ l'unique chemin de $\mathscr{D}$ sortant de l'état initial $J$ et ayant pour entrée $u$. Alors l'état $P$ est égal à
+		\begin{quotation}
+			$P = \{(q,w) \mid \text{ il existe un chemin } i \xrightarrow{u/vw} q \text{ dans } \mathscr{T} \text{ où } i \in I \}$.
+		\end{quotation}
+	\end{lemma}
+	\begin{proof}
+		Par induction sur la longueur de $u$. On considère un chemin de $\mathscr{D}$
+		\begin{quotation}
+			$J \xrightarrow{u/v} P \xrightarrow{a/t} P'$,
+		\end{quotation}
+		où $a \in \Sigma$ est un symbole sur l'alphabet d'entrée. Soit $(q',w') \in P'$. Par la définition des transitions de $\mathscr{D}$, il y a une paire $(q,w) \in P$ et une transition $q \xrightarrow{a/t'} q'$ dans $\mathscr{T}$ telle que $tw' = wt'$. \\
+		Par hypothèse d'induction, il existe un chemin $i \xrightarrow{u/vw} q$ dans $\mathscr{T}$ et on a $vtw' = vwt'$. \\
+	\end{proof}
+	
+	Une conséquence du lemme~\ref{lem4} est que si les deux paires $(q,w)$ et $(q',w')$ appartiennent à un état $P$ accessible depuis un état initial de $mathscr{D}$ et que $q$ et $q'$ sont des états finaux de $\mathscr{T}$ alors forcément $w = w'$. Dans le cas contraire, $\mathscr{T}$ ne serait pas fonctionnel. On peut alors définir les états finaux de $\mathscr{D}$ comme les états contenant au moins une paire $(q,w)$ telle que $q$ est un état final de $\mathscr{T}$. La fonction $\Omega_f$ associe alors la sortie $w$ à l'état final contenant la paire $(q,w)$.
+	
+	Du lemme~\ref{lem4} et la définition de $\Omega_f$ découle la proposition suivante: \\
+	
+	\begin{proposition}[\cite{Bea02}]
+		Le transducteur sous-séquentiel $\mathscr{D}$ réalise la même fonction $f$ que le transducteur $\mathscr{T}$.
+	\end{proposition}
+	
+	L'algorithme~\ref{det} reprend le pseudo-code pour la déterminisation. Le nombre d'états créés étant exponentiel voire infini dans le cas où la fonction réalisée par le transducteur n'est pas sous-séquentielle, les états sont stockés dans une structure de données dynamique, ici une liste $newStates$, avant d'être recopiés dans le tableau du transducteur sous-séquentiel de sortie. Une nouvelle classe \textbf{MetaState} héritant de \textbf{TState} est créée. Elle possède un ensemble de paires composées d'un élément \textbf{TState} et d'un élément \textbf{String}. L'algorithme crée un état $suivant$ en calculant l'ensemble $R$ qui lui est associé, ensuite il vérifie si l'état $suivant$ a déjà été calculé lors d'un précédent appel, c'est-à-dire qu'il existe un cycle. Si c'est le cas, on crée une transition entre l'état courant et l'état équivalent à $suivant$ qui est déjà dans $newStates$. Si ce n'est pas le cas, alors l'état $suivant$ est ajouté à $newStates$, une transition entre l'état courant et $suivant$ est créée et l'algorithme continue à partir de $suivant$.
+	
+	La figure~\ref{AM} montre l'application de la procédure de déterminisation sur l'exemple de la figure~\ref{NONDET} qui ne réalise pas une fonction sous-séquentielle. Dans ce cas, un nombre infini d'états est créé. La figure~\ref{ex6} montre l'application de la procédure sur l'exemple de la figure~\ref{ex1}. Dans ce cas, l'algorithme s'arrête lorsque plus aucun nouvel état n'est créé.
+	
+	\begin{algorithm}
+		\caption{Déterminisation d'un transducteur}
+		\label{det}
+		\begin{algorithmic}[1]
+			\Require calcul sur $\mathscr{T} = (\mathscr{A},\Omega)$ réalisant une fonction sous-séquentielle $f$
+			\Ensure $\mathscr{D} = (\mathscr{T'}, \Omega_f)$ sous-séquentiel réalisant $f$
+			
+			\Statex
+			\State Créer une liste $newStates$ de MetaState
+			\State Créer un MetaState initial $init$
+			\For{$i$}{$1$}{$|Q|$}
+				\If{$states[i]$ est initial}
+					\State $init.addSubstate((states[i], \varepsilon))$
+				\EndIf
+			\EndFor
+			\Statex
+			\State $newStates.add(init)$
+			\State \textbf{computeNext}$(newStates,init)$
+			\Statex
+			\ForAll{état $s$ de $newStates$}
+				\ForAll{paire $(q,w)$ de $s$}
+					\If{$q$ est final}
+						\State Marquer $s$ comme final
+						\State Donner $w$ comme sortie à $s$
+					\EndIf
+				\EndFor
+			\EndFor
+		\end{algorithmic}
+	\end{algorithm}
+	
+	\begin{algorithm}
+		\caption{$ComputeNext(newStates, courant)$}
+		\begin{algorithmic}[1]
+			\Require Tableau de MetaState $newStates$, MetaState $courant$
+			\Ensure Calcule l'état suivant
+			
+			\Statex
+			\State Créer une liste $pool$ contenant toutes les transitions sortant des sous-états de $courant$
+			\While{$pool$ est non vide}
+				\State $input \gets pool[0].input$
+				\State Créer un MetaState $suivant$
+				\ForAll{transition $t$ de $pool$}
+					\If{$t.input = input$}
+						\ForAll{paire $(q,w)$ de $courant$}
+							\If{$t.origin = q$}
+								\State Ajouter $(t.dest, q+t.output)$ à $R$
+							\EndIf
+						\State Retirer $t$ de $pool$
+						\EndFor
+					\EndIf
+				\EndFor
+				\Statex
+				\State Calculer $lcp$ le plus long préfixe commun des $w$ de $(q,w) \in R$
+				\State $R' \gets \{(q,lcp^{-1}w) \mid (q,w) \in R\}$
+				\State Donner l'ensemble de paires $R'$ à $suivant$
+				\Statex
+				\ForAll{état $state$ de $newStates$}
+					\If{$state = suivant$}
+						\State Ajoute $courant$ à $newStates$
+						\State créer une transition $courant \xrightarrow{input/lcp} state$
+						\State \textbf{computeNext$(newStates,next)$}
+					\EndIf
+				\EndFor
+				
+				\If{$suivant$ n'avait pas encore été créé}
+					\State créer une transition $courant \xrightarrow{input/lcp} suivant$
+				\EndIf
+			\EndWhile
+		\end{algorithmic}
+	\end{algorithm}
+	
+	\input{tikz/AM}
+	
+	\input{tikz/ex6}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

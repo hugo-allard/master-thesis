@@ -1,0 +1,55 @@
+\chapter{Schéma XML}
+\label{schema}
+
+	\begin{lstlisting}[caption={Schéma XML pour le format de fichier}]
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<xs:element name="graph" type="graph"/>
+<xs:element name="automaton" type="graph"/>
+<xs:element name="transducer" type="graph"/>
+
+	<xs:complexType name="graph">
+		<xs:sequence>
+			<xs:element name="nodes">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="node" type="node" maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+			<xs:element name="transitions">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="transition" type="transition" maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+
+		<xs:attribute name="size" type="xs:positiveInteger" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="node">
+		<xs:attribute name="id" type="xs:nonNegativeInteger" use="required"/>
+		<xs:attribute name="initial" type="xs:boolean"/>
+		<xs:attribute name="accepting" type="xs:boolean"/>
+		<xs:attribute name="output" type="xs:string"/>
+	</xs:complexType>
+
+	<xs:complexType name="transition">
+		<xs:attribute name="from" type="xs:nonNegativeInteger" use="required"/>
+		<xs:attribute name="to" type="xs:nonNegativeInteger" use="required"/>
+		<xs:attribute name="input" type="xs:string" use="required"/>
+		<xs:attribute name="output" type="xs:string"/>
+	</xs:complexType>		
+</xs:schema>
+	\end{lstlisting}
+
+\chapter{Code source}
+\label{code}
+
+Contient le code source complet, un programme exécutable prenant en entrée et effectuant les tests tels que décrits au chapitre~\ref{implementation} ainsi que plusieurs exemples au format XML.
+
+Le programme fourni se lance avec la commande \textbf{java -jar Prog.jar}, il prend éventuellement comme arguments l'emplacement du fichier d'entrée et l'emplacement du fichier de sortie.

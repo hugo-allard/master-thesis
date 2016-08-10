@@ -1,0 +1,30 @@
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[%
+	>=stealth,
+	shorten >=1pt,
+	node distance=2.5cm,
+	on grid,
+	auto,
+	state/.append style={fill=state, minimum size=2em},
+	thick,
+	highlight/.style={fill=green},
+	edgelight/.style={draw=blue, text=blue},
+	]
+	
+	\node[state,initial,initial text={}] (A) {$0,0$};
+	
+	\node[state] (B) [right of=A] {$1,5$};
+	\node[state] (C) [right of=B] {$2,6$};
+	\node[state] (D) [right of=C] {$3,7$};
+	\node[state,accepting] (E) [right of=D] {$4,8$};
+	
+	\path[->]
+	(A)    edge node {$a/(d,d)$} (B)
+	
+	(B)	   edge node {$b/(c,\varepsilon)$} (C)
+	(C)	   edge node {$c/(b, cba)$}	(D)
+	(D)	   edge node {$d/(a,\varepsilon)$}	(E);
+	
+	\end{tikzpicture}
+\end{figure}

@@ -1,0 +1,40 @@
+\begin{figure}
+		\centering
+		\begin{tikzpicture}[%
+			>=stealth,
+			shorten >=1pt,
+			node distance=2.5cm,
+			on grid,
+			auto,
+			state/.append style={fill=state, minimum size=2em},
+			thick,
+			highlight/.style={fill=green},
+			edgelight/.style={draw=blue, text=blue}
+		]
+		
+		\node[state,initial,initial text={}] (A)		     {$0$};
+		
+		\node[state,onslide={<2> highlight}] (B) [above right of=A] {$1$};
+		\node[state,onslide={<3> highlight}] (C) [right of=B] {$2$};
+		\node[state,onslide={<4> highlight}] (D) [right of=C] {$3$};
+		\node[state,accepting,onslide={<5> highlight}] (E) [right of=D] {$4$};
+		
+		\node[state,onslide={<2> highlight}] (F) [below right of=A] {$5$};
+		\node[state,onslide={<3> highlight}] (G) [right of=F] {$6$};
+		\node[state,onslide={<4> highlight}] (H) [right of=G] {$7$};
+		\node[state,accepting,onslide={<5> highlight}] (I) [right of=H] {$8$};
+		
+		\path[->]
+		(A)    edge [onslide={<2> edgelight}] node {$a/d$} (B)
+			   edge [onslide={<2> edgelight}] node [swap] {$a/d$}	(F)
+			   
+		(B)	   edge [onslide={<3> edgelight}] node {$b/c$} (C)
+		(C)	   edge [onslide={<4> edgelight}] node {$c/b$}	(D)
+		(D)	   edge [onslide={<5> edgelight}] node {$d/a$}	(E)
+		
+		(F)	   edge [onslide={<3> edgelight}] node [swap] {$b/\varepsilon$} (G)
+		(G)	   edge [onslide={<4> edgelight}] node [swap] {$c/cba$} (H)
+		(H)	   edge [onslide={<5> edgelight}] node [swap] {$d/\varepsilon$} (I);
+		
+	\end{tikzpicture}
+\end{figure}

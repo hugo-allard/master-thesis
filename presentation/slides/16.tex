@@ -1,0 +1,24 @@
+\frametitle{Transducteurs fonctionnels}
+\framesubtitle{}
+
+Décider la fonctionnalité
+	\include{tikz/SQUAREACTION}
+
+	\centering
+	\only<2,3,4,5>{Retard en } %
+	\only<2>{(1,5) :}%
+	\only<3>{(2,6) :}%
+	\only<4>{(3,7) :}%
+	\only<5>{(4,8) :}%
+	\only<2>{$delay(d,d) = (\varepsilon, \varepsilon)$}
+	\only<3>{$delay(c,\varepsilon) = (c, \varepsilon)$}
+	\only<4>{$delay(cb,cba) = (\varepsilon, a)$}
+	\only<5>{$delay(a,a) = (\varepsilon, \varepsilon)$}
+	
+	\only<6>{\begin{itemize}
+			\item A faire pour chaque chemin réussi de $\mathscr{T}^2$!
+			\item Fonctionnel si le retard calculé à chaque état final de $\mathscr{T}^2$ est $(\varepsilon, \varepsilon)$
+			\begin{quotation}
+				$\rightarrow$ Simple parcours de $\mathscr{T}^2 \Rightarrow$ linéaire en $|Q|^2$.
+			\end{quotation}
+		\end{itemize}}

@@ -1,0 +1,298 @@
+\label{terminologie}
+
+Ce chapitre introduit les notions importantes à la compréhension de ce mémoire et fixe les notations qui seront utilisées par la suite. La section~\ref{alph} présente les concepts de base que sont les alphabets et les langages, la section~\ref{aut} détaille les automates, qui sont le modèle sous-jacent des transducteurs qui sont, eux, discutés à la section~\ref{trans}. Enfin, la section~\ref{prob} décrit plusieurs problèmes de décisions pour les automates et les transducteurs, montrant ainsi l'intérêt des classes de transducteurs fonctionnels et sous-séquentiels.
+
+Les notations et la terminologie étant souvent différentes d'un auteur à l'autre, elles ont ici été fixées à partir de plusieurs sources. Les définitions et notations des alphabets, mots et langages proviennent essentiellement de Berstel~\cite{Ber79} et Hopcrof~et~al.~\cite{Hop06}, les définitions d'automates et de transducteurs sont celles utilisées par Servais~\cite{Ser11}.
+
+\section{Alphabets et mots}
+\label{alph}
+
+    Un \emph{alphabet} $\Sigma$ est un ensemble fini et non-vide dont les éléments sont appelés \emph{symboles}. Un \emph{mot} $u$ sur un alphabet $\Sigma$ est une séquence de symboles de $\Sigma$. \\
+    Soit $u = a_1\ldots a_n$ avec $a_i \in \Sigma$ $\forall i \leq n$. On note $|u| = n$ la \emph{longueur} du mot $u$, c'est-à-dire le nombre de symboles le composant. On note $|u|_a$ avec $a \in \Sigma$ le nombre d'occurrences du symbole $a$ dans le mot $u$. Le \emph{mot vide}, de longueur nulle, est noté $\varepsilon$ : $|\varepsilon | = 0$. \\
+    Soient $u = a_1\ldots a_n$ et $v = b_1\ldots b_m$ deux mots sur $\Sigma$. Leur \emph{concaténation}, notée $u\cdot v = a_1\ldots a_nb_1\ldots b_m$, est le mot obtenu en faisant suivre les symboles de $u$ par les symboles de $v$. La concaténation de $k$ copies d'un même mot $u$ est notée $u^k = u\cdot u\cdot \ldots \cdot u$, en particulier $u^0 = \varepsilon$. Lorsqu'il est clair dans le contexte, l'opérateur $\cdot$ peut être omis et $u \cdot v$ devient $uv$. La concaténation est associative est admet $\varepsilon$ comme élément neutre.
+    
+    Soit $n \in \mathbb{N}$. $\Sigma^n = \{a_1a_2\ldots a_n \mid \forall i \leq n : a_i \in \Sigma \}$ est l'ensemble de tous les mots de longueur $n$ sur $\Sigma$. En particulier, $\Sigma^0 = \{ \varepsilon \}$ est l'ensemble contenant uniquement le mot vide. \\
+    L'\emph{étoile de Kleene}, notée $^*$, est un opérateur unaire sur un alphabet $\Sigma$ tel que $\Sigma^* = \bigcup_{n \geq 0} \Sigma^n$. C'est-à-dire l'ensemble de tous les mots sur $\Sigma$. \\
+    Le \emph{plus de Kleene}, noté $^+$, est tel que $\Sigma^+ = \bigcup_{n \geq 1} \Sigma^n$. C'est-à-dire l'ensemble de tous les mots non-vides sur $\Sigma$. \\
+
+	\begin{definition}[Monoïde]
+		Un ensemble $(M, \bullet)$ est un \emph{monoïde} si $\bullet$ est une loi de composition associative sur $M$ admettant un élément neutre $1_M \in M$.
+	\end{definition}
+    
+    Soient $(A, \circ)$ et $(B, \bullet)$ deux monoïdes de neutre respectif $1_A$ et $1_B$. Une application $h: A\to B$ est un \emph{morphisme} de monoïde si:
+    \begin{enumerate}
+		\item $\forall x,y \in A : h(x \circ y) = h(x) \bullet h(y)$ 
+		\item $h(1_A) = 1_B$ \\
+	\end{enumerate}
+	Un \emph{isomorphisme} est un morphisme qui admet un inverse qui est lui-même un morphisme. Deux structures sont dites \emph{isomorphes} s'il existe un isomorphisme de l'une vers l'autre. Un monoïde $M$ est dit \emph{libre} s'il existe un isomorphisme de $M$ à $A^*$ où $A$ est un alphabet.
+
+    $\Sigma^*$ muni de la concaténation forme donc le monoïde libre $(\Sigma^*, \cdot)$ et $\Sigma^+$ muni de la concaténation forme quant à lui le \emph{semi-groupe} $(\Sigma^+, \cdot)$.
+    
+    Soient $u,v \in \Sigma^*$ deux mots sur $\Sigma$. On note $u \preceq v$ si $u$ est \emph{préfixe} de $v$, c'est-à-dire $v = uw$ avec $w \in \Sigma^*$. On note $u^{-1}v$ le mot obtenu en retirant le préfixe $u$ de $v : u^{-1}v = w$. Le mot $w = u \wedge v \in \Sigma^*$ est le \emph{plus long préfixe commun} de $u$ et $v$, c'est-à-dire que $w \preceq u$, $w \preceq v$ et pour tout $w' \in \Sigma^*$ tel que $w' \preceq u$ et $w' \preceq v$ on a $w' \preceq w$. En particulier, le mot $(u \wedge v)^{-1}v$ est le mot obtenu de $v$ en lui retirant son plus long préfixe commun avec $u$. La \emph{distance préfixe} entre $u$ et $v$ est calculée comme $||u,v|| = |u|+|v|-2|u \wedge v|$.
+    
+    Soient $\Sigma$ et $\Delta$ deux alphabets, $u$ et $v = a_1\ldots a_n$ $\in \Sigma^*$ deux mots sur $\Sigma$. L'image de $v$ par un morphisme $h: \Sigma^*\to \Delta^*$ est $h(v) = h(a_1\cdot \ldots \cdot a_n) = h(a_1)\cdot \ldots \cdot h(a_n)$. On a donc également $h(u \cdot v) = h(u) \cdot h(v)$ et $h(\varepsilon) = \varepsilon$.
+    
+    Soit $\Sigma$ un alphabet. Un ensemble de mots sur $\Sigma$, $L \subseteq \Sigma^*$ est appelé un \emph{langage} sur $\Sigma$. De la même manière, un ensemble de langages sur $\Sigma$ est appelé une \emph{classe de langages} $\mathcal{L} \subseteq 2^{\Sigma^*}$. \\
+
+	\begin{definition}[Langages rationnels]
+		Soit $M$ un monoïde, on définit l'ensemble des \emph{parties rationnelles} de $M$, notée $Rat(M)$, comme le plus petit ensemble $E$ des parties de $2^M$ contenant les singletons de $M$ et clos pour les \emph{opérations rationnelles} (l'union, la concaténation et l'étoile de Kleene):
+		\begin{enumerate}
+			\item $\emptyset \in E, \forall m \in M \quad \{m\} \in E$,
+			\item $\forall X,Y \in E, X \cup Y \in E, X \cdot Y \in E, X^* \in E$.
+		\end{enumerate}
+		Un \emph{langage rationnel} sur un alphabet $\Sigma$ est un élément de $Rat(\Sigma^*)$.
+	\end{definition}
+
+	Le langage vide sur un alphabet $\Sigma$ est le langage $\{\varepsilon\}$ composé uniquement du mot vide.
+
+    Soient $\Sigma$ et $\Delta$ deux alphabets. Une \emph{transduction} $t: \Sigma^*\to \Delta^*$ est une relation $R \subseteq \Sigma^*\times \Delta^*$ entre des mots sur $\Sigma$ et des mots sur $\Delta$. Si $(u,v) \in R$, on dit que $v$ est la \emph{transduction} ou \emph{l'image} de $u$ par $R$. On note $R(u) = \{v \in \Delta^* \mid (u,v) \in R\}$ l'ensemble de toutes les transductions de $u$ par $R$. Cette notation s'étend aux langages: $R(L) = \bigcup_{u \in L} R(u)$ est l'ensemble de toutes les transductions par $R$ des mots de $L$. \\
+    On note $dom(R) = \{u \in \Sigma^* \mid \exists v \in \Delta^* : (u,v) \in R\}$ le \emph{domaine} de $R$ et $Im(R) = \{v \in \Delta^* \mid \exists u \in \Sigma^* : (u,v) \in R\}$ l'ensemble \emph{image} de $R$. \\
+	Une transduction est dite \emph{rationnelle} si sa relation $R$ est une partie rationnelle de $\Sigma^* \times \Delta^*$. Elle est dite \emph{fonctionnelle} si pour tout mot $u \in \Sigma^*$, il existe au plus un mot $v \in \Delta^*$ tel que $(u,v) \in R$. Afin d'alléger le vocabulaire, une relation fonctionnelle pourra plus simplement être appelée «fonction» par la suite.
+
+	Une \emph{classe de transductions} $\mathcal{T}$ sur $\Sigma^* \times \Delta^*$ est un ensemble de transductions sur $\Sigma^* \times \Delta^*$: $\mathcal{T} \subseteq 2^{\Sigma^* \times \Delta^*}$.
+
+    % DONNER UN EXEMPLE DE TRANSDUCTION !!!!
+    
+\section{Automates}
+\label{aut}
+ 
+    Un \emph{automate fini} est un modèle mathématique composé d'un ensemble d'états pouvant être initiaux et/ou finaux, et d'une relation de composition acceptant certains triplets (état courant, symbole courant, état suivant) qui forme un ensemble de transitions. Il prend en entrée un mot sur un certain alphabet, le lit de gauche à droite, symbole par symbole, et passe d'un état à un autre en sélectionnant une transition compatible avec le symbole lu à cette étape. Selon la configuration finale de l'automate, le mot d'entrée peut soit être accepté soit être refusé. L'ensemble de tous les mots acceptés par l'automate forme alors un langage $L$, on dit que l'automate \emph{reconnaît} $L$.
+	Il faut différencier les automates déterministes, qui ne se trouvent que dans un seul état à un moment donné et les automates non-déterministes, qui peuvent se trouver dans plusieurs états en même temps.
+    
+    Il convient maintenant de définir ces notions plus rigoureusement. \\
+    
+    \begin{definition}[$\varepsilon$-NFA]
+		Un automate fini asynchrone, aussi appelé automate à $\varepsilon$-transitions ($\varepsilon$-NFA pour \emph{$\varepsilon$-transition Nondeterministic Finite Automaton}) est un quintuplet $\mathscr{A} =$ $(\Sigma,Q,I,F,\delta)$ où
+		
+		\begin{itemize}
+			\item $\Sigma$ est l'alphabet d'entrée,
+			\item $Q$ est l'ensemble fini des états,
+			\item $I$ est l'ensemble des états initiaux,
+			\item $F \subseteq Q$ est l'ensemble des états finaux,
+			\item $\delta \subseteq Q \times (\Sigma \cup \{\varepsilon\}) \times Q$ est la relation de transition.
+		\end{itemize}
+	\end{definition}
+	
+	Soit $\mathscr{A}$ un $\varepsilon$-NFA. Un \emph{chemin} $\rho$ sur $\mathscr{A}$ avec l'entrée $u=a_1\ldots a_n$ de l'état $q_0$ à l'état $q_n$ est une séquence de transitions de la forme $\rho = (q_0,a_1, q_1)\ldots(q_{n-1},a_n,q_n)$ telle que pour tout $i \in \{1,\ldots ,n\}$, on a $a_i \in \Sigma \cup \{\varepsilon\}$ et $(q_{i-1},a_i,q_i) \in \delta$. Le chemin est dit \emph{acceptant} si $q_0 \in I$ et $q_n \in F$. Un mot $u$ est \emph{accepté} par un automate $\mathscr{A}$ s'il existe un chemin acceptant sur $\mathscr{A}$ avec l'entrée $u$. On note $\rho^{acc}(\mathscr{A},u)$ l'ensemble des chemins acceptants sur $\mathscr{A}$ avec l'entrée $u$. Le langage $L(\mathscr{A}) = \{u \in \Sigma^* \mid \rho^{acc}(\mathscr{A},u) \neq \emptyset\}$ est l'ensemble des mots acceptés par $\mathscr{A}$, c'est-à-dire le langage \emph{reconnu} par $\mathscr{A}$. Deux automates sont \emph{équivalents} s'ils reconnaissent le même langage. \\
+	Soient $q_0,\ldots, q_n \in Q$, $u = a_1\ldots a_n \in \Sigma^*$, on écrit la transition $(q_0, a_1, q_1)$ comme $q_0 \xrightarrow{a_1} q_1$, on écrit le chemin $(q_0, a_1, q_1)\ldots(q_{n-1}, a_n, q_n)$ comme $q_0 \xrightarrow{a_1} q_1\xrightarrow{a_2}\ldots \xrightarrow{a_{n-1}}q_{n-1} \xrightarrow{a_n} q_n$ ou comme $q_0 \xrightarrow{u} q_n$ s'il n'y a pas d'ambiguïté sur l'étiquette de la flèche. \\
+	On définit la taille d'un automate comme suit: $|\mathscr{A}| = |Q|+|\delta|$.
+	
+	Un automate peut être visualisé par une table de transition qui représente la relation $\delta$. Les lignes correspondent aux états et les colonnes correspondent aux entrées. Dans ce cas, un état initial est marqué d'une flèche et un état final est marqué d'un *. Soient $q \in Q$, $a \in \Sigma \cup \{\varepsilon\}$, la case de la table de transition correspondant à $(q,a)$ est l'ensemble $\{p \in Q \mid (q,a,p) \in \delta\}$.\\
+	Un automate peut également être représenté par un diagramme de transition qui est un graphe tel que
+
+	\begin{itemize}
+		\item Tout état de $Q$ est représenté par un n\oe{}ud.
+		\item Pour tout $q,p \in Q$, $a \in \Sigma \cup \{\varepsilon\}$, si $(q,a,p) \in \delta$ alors le graphe possède une flèche du n\oe{}ud $q$ au n\oe{}ud $p$.
+		\item Il y a un arc sans origine pointant vers les états initiaux.
+		\item Tout état final $q \in F$ est marqué par un double cercle ou par un arc sortant sans n\oe{}ud destination.
+	\end{itemize}
+
+	La figure~\ref{NFA} montre un automate asynchrone sous ces deux formes.
+
+	\input{tikz/NFA}
+	
+	Soit $q \in Q$ un état d'un $\varepsilon$-NFA, $q$ est dit \emph{accessible} s'il existe un chemin allant d'un état initial jusque l'état $q$. On dit que $q$ est \emph{co-accessible} s'il existe un chemin allant de $q$ à un état final. Un état est dit \emph{utile} s'il est à la fois accessible et co-accessible. Un automate est \emph{émondé} si tous ses états sont utiles. Il est possible d'émonder un automate en temps linéaire, un algorithme est donné à la section~\ref{emondage}. \\
+	
+	\begin{definition}[NFA]
+		Un $\varepsilon$-NFA $\mathscr{A}=(\Sigma,Q,I,F,\delta)$ tel que $\delta \subseteq Q \times \Sigma \times Q$ est appelé \emph{Automate fini non déterministe temps réel} ou Automate fini non déterministe (NFA pour \emph{Nondeterministic Finite Automaton}).
+	\end{definition}
+
+	Un NFA est donc un $\varepsilon$-NFA sans $\varepsilon$-transition. Il est prouvé que la classe des $\varepsilon$-NFA et celle des NFA ont la même expressivité et qu'il existe un algorithme retirant les $\varepsilon$-transitions en temps polynomial. L'algorithme se base sur la fermeture transitive pour détecter les états atteignables par des $\varepsilon$-transitions et ensuite les supprimer. Une preuve et plus de détails sont donnés par Hopcroft~et~al.~\cite{Hop06}. \\
+	Une propriété intéressante est que puisqu'un NFA lit exactement un symbole dans chaque état, la longueur d'un chemin pour un mot en entrée est égal à la taille du mot. De plus, pour un NFA $\mathscr{A}=(\Sigma,Q,I,F,\delta)$ et un mot d'entrée $u$, il y a au maximum $|\delta|^{|u|}$ chemins possibles. \\
+	
+	% TRANSFORMER L'EXEMPLE 2.1 EN RETIRANT LES E TRANSITIONS ET CONTINUER L'EXEMPLE EN DFA
+	
+	\begin{definition}[DFA]
+		Un NFA $\mathscr{A}=(\Sigma,Q,I,F,\delta)$ tel que $|I| = 1$ et $((q,a,q')\in\delta \wedge (q,a,q'')\in\delta \Rightarrow q'=q'')$ est dit \emph{déterministe} (DFA pour Deterministic Finite Automaton).
+	\end{definition}
+
+	Un automate déterministe (DFA) est donc un NFA possédant un seul état initial et tel qu'à chaque symbole lu, il n'existe qu'une seule transition sortant de l'état courant qui soit compatible. La relation de transition est donc fonctionnelle et en conséquence il existe au plus un chemin possible par mot en entrée.
+	
+	Il est prouvé que tout NFA, et donc tout $\varepsilon$-NFA, est équivalent à un DFA. De plus, il existe un algorithme prenant en entrée un NFA et construisant un DFA équivalent dont la taille est exponentiellement plus grande. Cette procédure est appelée \emph{déterminisation} et se base sur la \emph{construction des sous-ensembles}. Une brève description de l'algorithme est donné ici, plus d'informations ainsi qu'une preuve de l'équivalence de la classe des NFA et celle des DFA sont données par Hopcroft~et~al.~\cite{Hop06}. \\
+	
+	Soit $\mathscr{N} = (\Sigma,Q_N,I,F_N,\delta_N)$ un NFA, l'algorithme construit un DFA $\mathscr{D} = (\Sigma, Q_D, q_0, F_D, \delta_D)$ tel que $L(\mathscr{D}) = L(\mathscr{N})$ comme suit:
+		
+	\begin{itemize}
+		\item $q_0 = I$, l'unique état initial de $\mathscr{D}$ contient tous les états initiaux de $\mathscr{N}$.
+		\item $Q_D = 2^{Q_N}$, c'est-à-dire l'ensemble des sous-ensembles de $Q_N$. Certains de ces $2^{|Q_N|}$ états ne sont pas utiles mais $\mathscr{D}$ peut être émondé.
+		\item $F_D = \{S \in Q_D\mid S \cap F_N \neq \emptyset\}$, c'est-à-dire tous les états de $\mathscr{D}$ qui possèdent au moins un état final de $\mathscr{N}$.
+		\item $\delta_D(S,a) = \bigcup_{p \in S} \delta_N(p,a)$, pour tout $S \subseteq Q_N$ et pour tout $a \in \Sigma$. C'est-à-dire que $\delta_D(S,a)$ est l'union de tous les états accessibles dans $\mathscr{N}$ depuis l'état $p$ avec l'entrée $a$.
+	\end{itemize}
+
+	La figure~\ref{DFA} montre la construction d'un DFA par cet algorithme. Le DFA résultant est émondé par souci de clarté.
+
+	\input{tikz/DFA}
+
+	Les classes $\varepsilon$-NFA, NFA et DFA ont donc la même expressivité et il existe des algorithmes pour passer de l'une à l'autre. \\
+
+	\begin{definition}[Langage reconnaissable]
+		Un langage est dit \emph{reconnaissable} s'il existe un atomate fini le reconnaissant. On note $Rec(\Sigma^*)$ l'ensemble des langages reconnaissables sur $\Sigma^*$. \\
+	\end{definition}
+	
+	\begin{theorem}[Kleene]
+		Soit $\Sigma$ un alphabet. Un langage sur $\Sigma$ est rationnel si et seulement si il est reconnu par un automate: 
+		\begin{quotation}
+			$Rat(\Sigma^*) = Rec(\Sigma^*)$.
+		\end{quotation}
+	\end{theorem}
+	 
+	Les trois classes d'automates finis sont équivalentes et caractérisent les \emph{langages rationnels}. \\
+
+	\begin{definition}
+		Soit $k \in \mathbb{N}$, un $\varepsilon$-NFA $\mathscr{A}$ est \emph{$k$-ambigu} si et seulement si pour tout mot $u \in \Sigma^*$ on a $|\rho^{acc}(\mathscr{A},u)| \leq k$.
+	\end{definition}
+
+	Dans le cas où $k=1$, c'est-à-dire un automate 1-ambigu, on dit que l'automate est \emph{non-ambigu}. Un DFA est forcément non-ambigu mais un automate non-ambigu peut ne pas être déterministe. La figure~\ref{NONAMB} montre un tel automate reconnaissant les mots $ab$ et $ac$, clairement cet automate est non-déterministe mais il n'existe qu'un seul chemin par mot. Il est dès lors non-ambigu.
+	
+	\input{tikz/NONAMB}
+	
+\section{Transducteurs}
+\label{trans}
+  
+    Un \emph{transducteur fini} est essentiellement un automate fini augmenté d'un morphisme de sortie qui associe un mot à chaque transition de l'automate. L'automate fini sur lequel se base le transducteur est appelé \emph{automate sous-jacent}. Soient $\mathscr{A} = (\Sigma,Q,I,F,\delta)$ l'automate sous-jacent d'un transducteur, $\Omega$ le morphisme qui lui est associé et $\rho = (q_0,a_0,q_1)\ldots(q_{n-1},a_n,q_n)$ avec $q_i \in Q, a_i \in \Sigma \cup \{\varepsilon\}, \forall i \leq n$, un chemin sur l'automate sous-jacent. La sortie de ce transducteur pour ce chemin est alors $\Omega(\rho) = h( (q_0,a_0,q_1)\ldots(q_{n-1},a_n,q_n)) = h((q_0,a_0,q_1))\ldots h((q_{n-1},a_n,q_n))$, c'est-à-dire la concaténation des sorties de chacune des transitions du chemin. \\
+    
+    \begin{definition}[$\varepsilon$-NFT]
+		Un transducteur fini asynchrone de $\Sigma^*$ à $\Delta^*$ ($\varepsilon$-NFT pour $\varepsilon$-transitions Nondeterministic Finite Transducer) est une paire $\mathscr{T} = (\mathscr{A}, \Omega)$ où $\mathscr{A} = (\Sigma,Q,I,F,\delta)$ est un $\varepsilon$-NFA qui est l'automate sous-jacent d'entrée, et $\Omega:\delta \to \Delta^*$ est un morphisme appelé \emph{sortie}.
+	\end{definition}
+
+	Soient $\mathscr{T} = (\mathscr{A} = (\Sigma,Q,I,F,\delta), \Omega:\delta \to \Delta^*)$ un $\varepsilon$-NFT, $u \in \Sigma^*$ et $\rho = t_1\ldots t_n \in \rho^{acc}(\mathscr{A}, u)$. On dit que $v = \Omega(\rho) = \Omega(t_1\dots t_n) = \Omega(t_1)\ldots \Omega(t_n) \in \Delta^*$ est la sortie du chemin et l'image de $u$ par $\mathscr{T}$.
+	On définit l'\emph{automate sous-jacent de sortie} comme $\mathscr{A}' = (\Delta,Q,I,F,\delta')$ où $\delta' = \{(q, \Omega(q,a,p),p) \mid (q,a,p) \in \delta\}$, c'est-à-dire que l'étiquette de chaque transition dans l'automate sous-jacent d'entrée est remplacée par l'image de cette transition par le morphisme de sortie. \\
+	
+	\begin{theorem}
+		Une transduction est rationnelle si et seulement si il existe un transducteur fini la réalisant.
+	\end{theorem}
+	
+	Un transducteur $\mathscr{T}$ de $\Sigma^*$ à $\Delta^*$ peut donc être vu comme une paire d'automates, un automate d'entrée et un automate de sortie reconnaissant respectivement deux langages rationnels $L_{in} \subseteq \Sigma^*$ et $L_{out} \subseteq \Delta^*$. Il réalise une transduction rationnelle $R \subseteq L_{in} \times L_{out}$. Le domaine (Dom(T) = $L_{in}$), resp. l'image (Im(T) = $L_{out}$), du transducteur est le domaine, resp. l'image, de la transduction reconnue par le transducteur.
+	Le transducteur peut être représenté comme un automate dont les transitions sont étiquetées par des paires (entrée, sortie) $\in (\Sigma \cup \{\varepsilon\}) \times \Delta^*$. On écrit $q\xrightarrow{a/b}p$ une transition de $q$ à $p$ prenant $a$ en entrée et $b$ en sortie. De la même manière qu'avec les automates, cette notation peut s'étendre aux chemins. La transduction reconnue par $\mathscr{T}$ est donc $R(\mathscr{T}) = \{(u,v) \in \Sigma^* \times \Delta^* \mid q\xrightarrow{u/v}p : q \in I, p \in F\}$
+	
+	On notera également \emph{NFT}, resp. \emph{DFT}, la classe des transducteurs non-déterministes, resp. des transducteurs déterministes, c'est-à-dire les transducteurs finis dont l'automate sous-jacent d'entrée appartient à la classe NFA, resp. DFA.
+	On note R($\varepsilon$-NFT), resp. R(NFT), resp. R(DFT), la classe de transductions reconnues par un $\varepsilon$-NFT, resp. NFT, resp. DFT.
+	
+	Dans ce cas, les NFTs et les DFTs sont dits \emph{temps réel} car la première composante de chaque transition est un symbole de $\Sigma$ et non un mot de $\Sigma^*$. Pour tout transducteur il existe un transducteur temps-réel équivalent~\cite{Bea03} et on ne considère par la suite, sans perte de généralité, que les transducteurs temps réel. \\
+	
+	\begin{example}[\cite{Ser11}]
+	    Soient $\Sigma = \Delta = \{a,b\}$. Le transducteur $\mathscr{T}_\infty$, visible à la figure~\ref{UNI}, définit la transduction $R(\mathscr{T}_\infty) = \Sigma^* \times \Delta^*$ qui est la transduction universelle sur $\Sigma$. Ce transducteur est un $\varepsilon$-NFT.
+	\label{exUNI}
+	\end{example}
+    
+    \input{tikz/UNI}
+    
+    L'exemple~\ref{exUNI} montre un $\varepsilon$-NFT qui associe tout mot de $\Sigma^*$ à tout mot de $\Delta^*$. Chaque mot d'entrée a alors une infinité d'images. Or pour un NFT $\mathscr{T}$, il y a au plus $n = |\delta|^{|u|}$ chemins possibles pour un mot d'entrée $u$ (avec $\delta$ comme relation de transition de l'automate sous-jacent d'entrée de $\mathscr{T}$), il y a donc au plus $n$ images pour une entrée donnée. De la même manière, pour un DFT, il existe au plus un chemin par entrée et donc une seule image possible. On a donc les inclusions strictes R(DFT) $\subset$ R(NFT) $\subset$ R($\varepsilon$-NFT).
+
+    Un transducteur dont l'automate sous-jacent d'entrée est $k$-ambigu, resp. non-ambigu est lui-même dit \emph{$k$-ambigu}, resp. \emph{non-ambigu}. La classe des transducteurs \emph{fonctionnels} est l'ensemble de tous les transducteurs réalisant une transduction fonctionnelle.
+    
+    Un DFT est forcément fonctionnel. Cependant, un NFT non-déterministe peut réaliser une transduction fonctionnelle. Pour certains de ces NFT fonctionnels, il n'existe d'ailleurs pas de DFT équivalent. La figure~\ref{NONDET} montre un transducteur fonctionnel $\mathscr{T}$ tel que $R(\mathscr{T}) = \{(xy^{2n}x,ab^na^nb) \mid n \in \mathbb{N}\} \cup \{(xy^{2n}z,bb^na^na) \mid n \in \mathbb{N}\}$. Clairement, l'automate sous-jacent d'entrée est non-déterministe puisque les deux transitions sortant de $q_0$ on la même étiquette d'entrée. Cependant, l'entrée des transitions entrant dans $q_5$ étant différente, les mots d'entrée seront forcément différents selon qu'ils passent par $q_1$ ou $q_2$, le transducteur est donc fonctionnel. $\mathscr{T}$ n'est pourtant pas déterminisable. Une preuve du caractère non déterminisable est donné au chapitre~\ref{sequentiel} et l'application de l'algorithme de déterminisation sur cet exemple est montrée à la section~\ref{determinize}.
+    
+    \input{tikz/NONDET}
+    
+    De la même manière, un NFT non-ambigu est forcément fonctionnel mais un NFT ambigu peut malgré tout réaliser une transduction fonctionnelle. Dans ce cas tous les chemins acceptants sur une certaine entrée doivent produire la même sortie. La figure~\ref{AMB} montre un tel transducteur simple pour lequel il n'y a que deux chemins réussis distincts: le chemin $q_0 \xrightarrow{x/a} q_1 \xrightarrow{x/bc} q_2$ et le chemin $q_0 \xrightarrow{x/ab} q_2 \xrightarrow{x/c} q_3$. Clairement, les deux chemins prennent la même entrée, l'automate sous-jacent est donc ambigu, mais ces deux chemins produisent la même sortie, le transducteur est donc fonctionnel.
+    
+    Les NFT non-ambigus sont plus puissants que les DFT et il a été prouvé que toutes les transductions fonctionnelles peuvent être réalisées par un NFT non-ambigu.\cite{Em65}
+    
+    \input{tikz/AMB}
+
+	Il est possible d'étendre les DFT en ajoutant un morphisme de sortie pour les états finaux. Dans ce cas, un mot de sortie supplémentaire est ajouté à la suite du mot produit pour l'entrée. Un tel transducteur est appelé \emph{sous-séquentiel}. Ce terme fait référence aux transducteurs \emph{séquentiels} qui sont les transducteurs déterministes en entrée. La distinction entre les termes séquentiels et DFT provient du fait que les transducteurs peuvent être déterministes en entrée et déterministes en sortie. Séquentiel signifie donc déterministe en entrée et évite l'ambiguïté du terme déterministe. Certains auteurs ajoutent une contrainte supplémentaire aux transducteurs séquentiels en ne considérant que les transducteurs déterministes en entrée dont tous les états sont finaux. Dans le cadre de ce mémoire, séquentiel et DFT seront équivalents.
+	
+	Une transduction est dite \emph{sous-séquentielle} si et seulement si il existe un transducteur sous-séquentiel la réalisant. \\
+	
+	\begin{definition}
+		Un transducteur sous-séquentiel $\mathscr{T}$ de $\Sigma$ à $\Delta$ est une paire $(\mathscr{T}',\Omega_f)$ où $\mathscr{T}' = (\mathscr{A} = (\Sigma, Q, I, F, \delta), \Omega)$ est un DFT et $\Omega_f$ est un morphisme de $F$ à $\Delta^*$.
+	\end{definition}
+	
+	La sortie d'un chemin réussi $\rho = q_0 \xrightarrow{u/v} q_n$ sur un transducteur sous-séquentiel $\mathscr{T}$ est donc $v \cdot \Omega_f(q_n)$.
+	Les transducteurs sous-séquentiels sont plus expressifs que les DFT. En effet, l'exemple~\ref{SSE} montre une relation reconnaissable par un transducteur sous-séquentiel mais pas par un transducteur séquentiel. De fait, on peut prouver que pour une transduction séquentielle $f$ et deux mots $u,v \in Dom(f)$ tels que $u \prec v$ alors $f(u) \prec f(v)$. Hors, pour l'exemple~\ref{SSE}, un mot $w \in \Sigma^*$ et un symbole $x \in \Sigma, f(w) \not\prec f(wx)$.
+	
+	La figure~\ref{SUBSEQ} montre un transducteur sous-séquentiel réalisant la transduction de l'exemple~\ref{SSE}. Par la suite, un état final $q$ d'un transducteur sous-séquentiel sera représenté par double cercle duquel sort un flèche sans destination, étiquetée par $\Omega_f(q)$. \\
+
+	\input{tikz/SUBSEQ}
+
+	\begin{example}[\cite{Ser11}]
+		$R_{odd} = \{(u,ua) \mid u \in \Sigma^* \wedge |u|$ est impair$\} \cup \{(u,ub) \mid u \in \Sigma^* \wedge |u|$ est pair$\}$
+		\label{SSE}
+	\end{example}
+
+	Inversement, chaque transduction déterministe est forcément sous-séquentielle puisqu'il suffit de considérer un morphisme qui associe le mot vide à chaque état final.
+
+\section{Problèmes de décision}
+\label{prob}
+
+	Soient $\mathscr{A}_1, \mathscr{A}_2$ deux automates finis sur $\Sigma$ et $u \in \Sigma^*$ un mot sur $\Sigma$. Il est intéressant de considérer plusieurs problèmes de décision:
+	
+	\begin{description}
+	  	\item[Appartenance] revient à tester $u \in L(\mathscr{A}_1)$
+	   	\item[Vide] revient à tester $L(\mathscr{A}_1) = \emptyset$
+	   	\item[Universalité] revient à tester $L(\mathscr{A}_1) = \Sigma^*$
+	   	\item[\'{E}quivalence] revient à tester $L(\mathscr{A}_1) = L(\mathscr{A}_2)$
+	   	\item[Inclusion] revient à tester $L(\mathscr{A}_1) \subseteq L(\mathscr{A}_2)$
+	    \end{description}
+	
+	La plupart des problèmes de décision sont décidables pour les automates. \\
+
+    \begin{proposition}[\cite{Ser11}]
+    	Les problèmes suivants sont décidables:
+    	
+    	\begin{itemize}
+    		\item Le vide et l'appartenance sont décidables en temps polynomial pour $\varepsilon$-NFA et NFA et DFA.
+    		\item L'universalité, l'inclusion et l'équivalence sont PSpace-complets pour $\varepsilon$-NFA et NFA. Décidables en temps polynomial pour DFA.
+    		\item Pour un certain k, on peut vérifier si un NFA est k-ambigu en temps polynomial. Une description de l'algorithme pour décider l'ambiguïté est donné au chapitre~\ref{fonctionnel}.
+    	\end{itemize}
+    \end{proposition}
+    
+    De la même manière que pour les automates, on s'intéresse aux problèmes de décisions pour les transducteurs.
+    Soient $\mathscr{T}_1, \mathscr{T}_2$ deux transducteurs finis de $\Sigma^*$ à $\Delta^*$, et $u \in \Sigma^*,v \in \Delta^*$ deux mots.
+    	
+    \begin{description}
+    	\item[Appartenance] revient à tester $(u,v) \in R(\mathscr{T}_1)$
+    	\item[Vide] revient à tester $R(\mathscr{T}_1) = \emptyset$
+    	\item[Universalité] revient à tester $R(\mathscr{T}_1) = \Sigma^* \times \Delta^*$
+    	\item[\'{E}quivalence] revient à tester $R(\mathscr{T}_1) = R(\mathscr{T}_2)$
+    	\item[Inclusion] revient à tester $R(\mathscr{T}_1) \subseteq R(\mathscr{T}_2)$
+    \end{description}
+    
+    La relation définie par un transducteur $\mathscr{T}$ est vide si et seulement si $Dom(\mathscr{T})$ est vide. L'appartenance d'une paire $(u,v) \in \Sigma^* \times \Delta^*$ se teste en vérifiant l'appartenance de $v$ dans l'image de $u$ par $\mathscr{T}$. Il est possible de créer un NFA reconnaissant l'image de $u$ par $\mathscr{T}$ en temps polynomial. \\
+    
+    \begin{proposition}[\cite{Ser11}]
+        Le vide et l'appartenance sont décidables en temps polynomial pour $\varepsilon$-NFT.
+    \end{proposition}
+    
+    Griffiths a prouvé~\cite{Gri68} par une réduction au problème de correspondance de Post que l'équivalence, l'inclusion et l'universalité sont indécidables pour $\varepsilon$-NFT et NFT.  \\
+    
+    \begin{theorem}[\cite{Gri68}]
+        L'équivalence et l'inclusion sont indécidables pour $\varepsilon$-NFT et NFT. L'universalité est indécidable pour $\varepsilon$-NFT.
+    \end{theorem}
+    
+    Ces résultats sont répértoriés à la table~\ref{DEC}. L'équivalence et l'inclusion, deux problèmes importants, sont tous deux indécidables pour NFT. Cependant, le théorème~\ref{SOU} montre que pour un sous-ensemble de NFT, les NFT fonctionnels, ces problèmes deviennent décidables. \\
+    
+    \begin{theorem}[\cite{Sou09}]
+        L'équivalence et l'inclusion des NFT fonctionnels sont PSpace-complets.
+        \label{SOU}
+    \end{theorem}
+    
+    La preuve du théorème~\ref{SOU} se base sur le théorème~\ref{SCH} et ce dernier rend le théorème précédent d'autant plus intéressant. \\
+    
+    \begin{table}
+    	\center
+        \begin{tabular}{c|c|c|c}
+            & Vide & Equivalence & Universalité \\
+            & Appartenance & Inclusion & \\
+            \hline
+            $\varepsilon$-NFT & PTime & indéc. & indéc. \\
+            NFT & PTime & indéc. & - \\
+            DFT & PTime & PTime & - \\
+        \end{tabular}
+        \caption{Problèmes de décisions pour les transducteurs finis}
+        \label{DEC}
+    \end{table}
+
+    \begin{theorem}[\cite{Sch75}]
+        La fonctionnalité est une propriété décidable pour les transducteurs finis.
+        \label{SCH}
+    \end{theorem}
+    
+    Schutzenberger~\cite{Sch75} a prouvé que la fonctionnalité pour un NFT est décidable en NPTime. Ce résultat a par la suite été amélioré par Gurari~et~Ibarra \cite{Gi83} en temps polynomial. Une autre procédure a été présentée en 2003 par Béal~et~al. \cite{Bea03}. Cette dernière est détaillée au chapitre~\ref{fonctionnel} et son implémentation à la section~\ref{functionnal}. \\
+    
+    \begin{theorem}[\cite{Cho77}]
+        La sous-séquentialité est une propriété décidable pour les fonctions rationnelles.
+    \end{theorem}
+    
+    Choffrut~\cite{Cho77} a prouvé que les NFT sous-séquentialisables respectent une certaine \emph{propriété de jumelage} qui a été prouvée décidable en temps polynomial~\cite{Wk95}. Une procédure pour décider la sous-séquentialité~\cite{Bea03} et pour construire un transducteur sous-séquentiel équivalent à un NFT réalisant une transduction sous-séquentielle~\cite{Bea02} ont été présentées par Béal~et~al.. Ces dernières sont détaillées au chapitre~\ref{sequentiel} et leur implémentation aux section~\ref{subsequential} et~\ref{determinize}

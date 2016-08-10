@@ -1,0 +1,15 @@
+\frametitle{Transducteurs fonctionnels}
+\framesubtitle{}
+
+\begin{exampleblock}{Calcul du carré d'un transducteur}
+	Pour un transducteur $\mathscr{T} = (\mathscr{A} = (\Sigma, Q, I, F, \delta), \Omega)$ de $\Sigma$ à $\Delta$.
+	
+	\begin{itemize}
+		\item Les états de $\mathscr{T}^2$ sont l'ensemble $Q \times Q$,
+		\item Pour chaque paire de transitions $p \xrightarrow[\mathscr{T}]{a/u} q$ et $r \xrightarrow[\mathscr{T}]{a/v} s$ on crée une transition $(p,r) \xrightarrow[\mathscr{T} \times \mathscr{T}]{a/(u, v)} (q,s)$
+		\item Transducteur carré de $\Sigma$ à $\Delta \times \Delta$
+		\item Crée potentiellement des états inutiles
+		\item Complexité en $O(|Q|^2 + |\delta|^2)$
+	\end{itemize}
+\end{exampleblock}
+

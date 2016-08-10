@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<transducer size="6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="schema.xsd">
+
+  <nodes>
+    <node id="0" initial="true" />
+    <node id="1" />
+    <node id="2" />
+    <node id="3" />
+    <node id="4" />
+    <node id="5" accepting="true" />
+  </nodes>
+  
+  <transitions>
+    <transition from="0" to="1" input="x" output="a" />
+    <transition from="0" to="2" input="x" output="" />
+    <transition from="1" to="3" input="y" output="b" />
+    <transition from="1" to="5" input="x" output="b" />
+    <transition from="3" to="1" input="y" output="a" />
+    <transition from="2" to="4" input="y" output="a" />
+    <transition from="2" to="5" input="x" output="a" />
+    <transition from="4" to="2" input="y" output="b" />
+  </transitions>
+</transducer>

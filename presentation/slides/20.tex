@@ -1,0 +1,72 @@
+\frametitle{Transducteurs sous-séquentiels}
+\framesubtitle{}
+
+Déterminisation : ne fonctionne pas toujours
+
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[%
+	>=stealth,
+	shorten >=1pt,
+	node distance=1.8cm,
+	on grid,
+	auto,
+	state/.append style={fill=state, minimum size=1.2em, inner sep=0pt},
+	thick,
+	font=\scriptsize
+	]
+	
+	\node[state,initial above,initial text={}]  (A) {$0$};
+	\node[state]                      (B) [right of=A] {$1$};
+	\node[state]             (C) [left of=A] {$2$};
+	\node[state,accepting]             (D) [right of=B] {$3$};
+	\node[state,accepting]             (E) [left of=C] {$4$};
+	
+	\path[->]
+	(A) edge  node {$a/b$} (B)
+		edge node [swap] {$a/c$} (C)
+	
+	(B) edge  node {$b/b$} (D)
+		edge [loop above] node {$a/b$} ()
+		
+	(C) edge  node {$c/c$} (E)
+		edge [loop above] node [swap] {$a/c$} ();
+	
+	\end{tikzpicture}
+\end{figure}
+
+
+% EN CONSTRUCTION !!!!!!!!!!!
+
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[%
+	>=stealth,
+	shorten >=1pt,
+	node distance=2.2cm,
+	on grid,
+	auto,
+	state/.append style={fill=state, minimum size=1.5em, inner sep=2pt},
+	thick,
+	every text node part/.style={align=center},
+	font=\scriptsize
+	]
+	
+	\node[state,initial,initial text={}]  (A) {$0,\varepsilon$};
+	\node[state,onslide={<1> opacity=0}]                      (B) [right of=A] {$1,b$ \\ $2,c$};
+	\node[state,onslide={<1,2> opacity=0}]             (C) [right of=B] {$1,bb$ \\ $2,cc$};
+	\node[state,onslide={<1,2,3> opacity=0}]             (D) [right of=C] {$1,bbb$ \\ $2,ccc$};
+	
+	\path[->]
+	(A) edge [onslide={<1> opacity=0}]  node {$a/\varepsilon$} (B)
+	
+	(B) edge [onslide={<1,2> opacity=0}]  node {$a/\varepsilon$} (C)
+	
+	(C) edge [onslide={<1,2,3> opacity=0}]  node {$a/\varepsilon$} (D)
+		
+	(D) edge [dotted, onslide={<1,2,3,4> opacity=0}] node {$a/\varepsilon$} +(2,0);
+	
+	\end{tikzpicture}
+\end{figure}
+
+\only<5>{}

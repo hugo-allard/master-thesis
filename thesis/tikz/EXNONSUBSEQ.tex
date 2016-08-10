@@ -1,0 +1,168 @@
+\begin{figure}
+	
+	\begin{minipage}[b]{0.5\linewidth}
+
+		\centering
+		\begin{tikzpicture}[%
+		>=stealth,
+		shorten >=1pt,
+		node distance=1.6cm,
+		on grid,
+		auto,
+		state/.append style={minimum size=2ex},
+		font=\scriptsize
+		]
+		
+		\tikzstyle{smallstate}=[state, style={minimum size=0.8em},inner sep=.1mm]
+		
+		% Main
+		\node[state, initial,initial text={}]   (A)				 		{0};
+		\node[state,accepting]  (B) [above right of=A] 	{0};
+		\node[state]      		(C) [above right of=B] 	{0};
+		\node[state]      		(D) [below left of=A] 	{0};
+		\node[state,accepting]  (E) [below left of=D] 	{0};
+		
+		% Lower right useless
+		\node[state,dashed,inner sep=.4mm] (F) [below right=1.6cm and 0.3cm of A] {-1};
+		\node[state,dashed,inner sep=.4mm] (H) [below right=1.2cm and 0.3cm of F] {-2};
+		\node[state,dashed,inner sep=.4mm] (I) [above right=1.2cm and 0.3cm of H] {-3};
+		\node[state,dashed,inner sep=.4mm] (J) [below right=1.2cm and 0.3cm of I] {-4};
+		\node[state,dashed,inner sep=.4mm] (K) [above right=1.2cm and 0.3cm of J] {-5};
+		\node[state,dashed,inner sep=.4mm] (L) [below right=1.2cm and 0.3cm of K] {-6};
+		\node (U1) [above right=1.2cm and 0.3cm of L] {};
+		
+		% Upper left useless
+		\node[state,dashed,inner sep=.4mm] (M) [above left=1.6cm and 0.3cm of A] {-1};
+		\node[state,dashed,inner sep=.4mm] (N) [above left=1.2cm and 0.3cm of M] {-2};
+		\node[state,dashed,inner sep=.4mm] (O) [below left=1.2cm and 0.3cm of N] {-3};
+		\node[state,dashed,inner sep=.4mm] (P) [above left=1.2cm and 0.3cm of O] {-4};
+		\node[state,dashed,inner sep=.4mm] (Q) [below left=1.2cm and 0.3cm of P] {-5};
+		\node[state,dashed,inner sep=.4mm] (R) [above left=1.2cm and 0.3cm of Q] {-6};
+		\node (U2) [below left=1.2cm and 0.3cm of R] {};
+		
+		% Top one
+		\node[smallstate]   			(E1) 	[above=2cm of C]	{};
+		\node[smallstate,accepting]  	(D1) 	[left=1.2cm of E1] 	{};
+		\node[smallstate,initial above,initial text={}]      	(C1) 	[left=1.2cm of D1] 	{};
+		\node[smallstate]      			(B1) 	[left=1.2cm of C1] 	{};
+		\node[smallstate,accepting]  	(A1) 	[left=1.2cm of B1] 	{};
+		
+		% Side one
+		\node[smallstate, accepting]   	(A2) 	[left=1.8cm of E]		{};
+		\node[smallstate]  				(B2) 	[above=1.2cm of A2] 	{};
+		\node[smallstate,initial,initial text={}]      	(C2) 	[above=1.2cm of B2] 	{};
+		\node[smallstate,accepting]   	(D2) 	[above=1.2cm of C2] 	{};
+		\node[smallstate]  				(E2) 	[above=1.2cm of D2] 	{};
+		
+		\path[->]
+		(A) edge node [swap,sloped,pos=0] {$(x,x)$} (B)
+		edge node {}  (D)
+		edge [dashed] node {$(x,x^2)$}  (F)
+		edge [dashed] node {$(x,x^2)$} (M)
+		
+		(B) edge [bend right=10] node {} (C)
+		(C) edge [bend right=10] node {} (B)
+		
+		(D) edge [bend right=10] node {} (E)
+		(E) edge [bend right=10] node {} (D)
+		
+		(F) edge [dashed,bend right=30] node {} (H)
+		(H) edge [dashed,bend right=30] node {} (I)
+		(I) edge [dashed,bend right=30] node {} (J)
+		(J) edge [dashed,bend right=30] node {} (K)
+		(K) edge [dashed,bend right=30] node {} (L)
+		
+		(M) edge [dashed,bend left=30] node {} (N)
+		(N) edge [dashed,bend left=30] node {} (O)
+		(O) edge [dashed,bend left=30] node {} (P)
+		(P) edge [dashed,bend left=30] node {} (Q)
+		(Q) edge [dashed,bend left=30] node {} (R)
+		
+		(E1) edge [bend right=10] node {$a/x$} (D1)
+		(D1) edge [bend right=10] node {$a/x$} (E1)
+		(C1) edge node {$a/x$} (D1)
+			 edge node [swap,pos=0.4] {$a/x^2$} (B1)
+		(B1) edge [bend right=10] node {$a/x^2$} (A1)
+		(A1) edge [bend right=10] node {$a/x^2$} (B1)
+		
+		(E2) edge [bend right=10] node {$a/x$} (D2)
+		(D2) edge [bend right=10] node {$a/x$} (E2)
+		(C2) edge node {$a/x$} (D2)
+		edge node [swap,pos=0.4] {$a/x^2$} (B2)
+		(B2) edge [bend right=10] node {$a/x^2$} (A2)
+		(A2) edge [bend right=10] node {$a/x^2$} (B2);
+		
+		
+		\path
+		(L) edge [dotted,bend right=30,thick] node {} (U1)
+		(R) edge [dotted,bend left=30,thick] node {} (U2);
+		\end{tikzpicture}
+		
+		\captionof*{figure}{(a)}
+	\end{minipage}\qquad%
+	\begin{minipage}[b]{0.5\linewidth}
+		
+		\centering
+		\begin{tikzpicture}[%
+		>=stealth,
+		shorten >=1pt,
+		node distance=1.7cm,
+		on grid,
+		auto,
+		state/.append style={minimum size=0.8em},
+		font=\scriptsize
+		]
+		
+		\tikzstyle{smallstate}=[state, style={minimum size=0.8em},inner sep=.1mm]
+		
+		\node[state,inner sep=.3mm]      			(A)				 {$(\varepsilon,\varepsilon)$};
+		\node[state,accepting,inner sep=.3mm]      						(B) [below right of=A] {$(\varepsilon,\varepsilon)$};
+		\node[state,dashed]      						(E) [right of=B] {\textbf{0}};
+		\node[state,dashed]      						(F) [below of=B] {\textbf{0}};
+		\node[state,inner sep=.3mm]      									(C) [right of=F] {$(\varepsilon,\varepsilon)$};
+		
+		\node[smallstate,initial,initial text={}]      			(A1) [above of=A] {};
+		\node[smallstate,accepting]      						(B1) [right of=A1] {};
+		\node[smallstate]      						(C1) [right of=B1] {};
+		
+		\node[smallstate,initial above,initial text={}]      			(A2) [left of=A] {};
+		\node[smallstate,accepting]      						(B2) [below of=A2] {};
+		\node[smallstate]      						(C2) [below of=B2] {};
+		
+		\path[->]
+		+(-0.7,0.7) edge (A)
+		(A) edge node [swap,sloped,pos=1] {$(x,x)$} (B)
+		edge [bend left=25] node [sloped,pos=0.2] {$(yx,yx)$}  (C)
+		edge [bend left=50, dashed] node [pos=0.8] {$(yx,x)$}  (E)
+		edge [bend right=50, dashed] node [swap,pos=0.8] {$(x,yx)$} (F)
+		
+		(B) edge [bend right=10] node {} (C)
+		
+		(C) edge [bend right=10] node {} (B)
+		
+		(E) edge [bend right=10, dashed] node [swap,pos=0.8] {$(x,x)$} (F)
+		
+		(F) edge [bend right=10, dashed] node  {} (E)
+		
+		(A1) edge node [swap] {$a/x$} (B1)
+		edge [bend left=50] node {$a/yx$}  (C1)
+		
+		(B1) edge [bend right=10] node [swap,sloped] {$a/x$} (C1)
+		
+		(C1) edge [bend right=10] node [swap,sloped] {$a/x$} (B1)
+		
+		(A2) edge node {$a/x$} (B2)
+		edge [bend right=55] node [swap] {$a/yx$}  (C2)
+		
+		(B2) edge [bend right=10] node [swap] {$a/x$} (C2)
+		
+		(C2) edge [bend right=10] node [swap] {$a/x$} (B2);
+		
+		\end{tikzpicture}
+		\captionof*{figure}{(b)}
+		
+	\end{minipage}
+	
+	\caption{Deux transducteurs réalisant des fonctions qui ne sont pas sous-séquentielles. \cite{Bea03}}
+	\label{EXNONSUBSEQ}
+\end{figure}

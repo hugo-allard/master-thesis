@@ -1,0 +1,48 @@
+\begin{figure}
+	\begin{minipage}[b]{0.5\linewidth}
+
+		\centering
+		\begin{tabular}[b]{r||c|c|c}
+			 & $a$ & $b$ & $\varepsilon$ \\
+			\hline
+			\hline
+			$\to q_0$ & $\{q_0\}$ & $\{q_1,q_2\}$ & $\emptyset$ \\
+			$*q_1$ & $\{q_1\}$ & $\emptyset$ & $\emptyset$ \\
+			$q_2$ & $\{q_1\}$ & $\{q_0\}$ & $\{q_0\}$ \\
+    			\end{tabular}
+		\captionof*{table}{Table de transitions}
+	\end{minipage}%
+	\begin{minipage}[b]{0.5\linewidth}
+
+		\centering
+		\begin{tikzpicture}[%
+					>=stealth,
+					shorten >=1pt,
+					node distance=3cm,
+					on grid,
+					auto,
+					state/.append style={minimum size=2em},
+					thick
+					]
+
+			\node[state] (A)		     {$q_0$};
+			\node[state,accepting] (B) [below right of=A] {$q_1$};
+			\node[state] (C) [below left of=A] {$q_2$};
+				
+			\path[->]
+					+(-0.7,0.7) edge (A)
+					(A)         edge             	 node {$b$} 		 (B)
+					(A)         edge [bend left]    node {$b$} 		 (C)
+					(A) 	   edge [loop above] node {$a$}		  ()
+					(B)	   edge [loop above] node {$a$}		  ()
+					(C)	   edge [bend left]	 node {$\varepsilon,b$} (A)
+					(C)	   edge 		 node {$a$} 		  (B);
+								
+		\end{tikzpicture}
+		\captionof*{figure}{Diagramme de transitions}
+
+	\end{minipage}
+				
+	\caption{Automate fini asynchrone}
+	\label{NFA}
+\end{figure}

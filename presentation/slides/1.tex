@@ -1,0 +1,22 @@
+\frametitle{Automates finis}
+\framesubtitle{}
+
+\begin{itemize}
+	\item Accepte des mots sur un alphabet $\Sigma$
+	\item Reconnaît un langage $\subseteq \Sigma^*$
+\end{itemize}
+
+\begin{block}{Définition}
+	Un automate fini sur l'alphabet $\Sigma$ est un quintuplet $\mathscr{A} = (\Sigma,Q,I,F,\delta)$ où
+	
+	\begin{itemize}
+		\item $\Sigma$ est l'alphabet d'entrée,
+		\item $Q$ est l'ensemble fini des états,
+		\item $I$ est l'ensemble des états initiaux,
+		\item $F \subseteq Q$ est l'ensemble des états finaux,
+		\item $\delta \subseteq Q \times \Sigma \times Q$ est la relation de transition.
+	\end{itemize}
+\end{block}
+
+\centering
+$L(\mathscr{A}) = \{w \in \Sigma^* \mid \exists$ un chemin réussi pour $w \}$

@@ -1,0 +1,35 @@
+\begin{figure}
+	
+	\centering
+	\begin{tikzpicture}[%
+		>=stealth,
+		shorten >=1pt,
+		node distance=2.5cm,
+		on grid,
+		auto,
+		state/.append style={minimum size=1.5em}
+		]
+		
+		\node[state,initial,initial text={},accepting] 	(A)		{$q_0$};
+		\node[state]				(B) [above right of=A] 	{$q_1$};
+		\node[state,accepting]		(C) [below right of=A]		{$q_2$};
+		\node[state,accepting] 	(D) [right of=B]	{$q_3$};
+		\node[state] 	(E) [right of=C]	{$q_4$};
+		
+		\path[->]
+		(A) edge node {$a/b$} (B)
+		edge [swap] node {$a/c$} (C)
+		
+		(B) edge [bend left] node {$a/b$} (D)
+		
+		(C) edge [bend left] node {$a/c$} (E)
+		
+		(D) edge [bend left] node {$a/b$} (B)
+		
+		(E) edge [bend left] node {$a/c$} (C);
+		
+	\end{tikzpicture}
+	
+	\caption{Transducteur réalisant la fonction de l'exemple~\ref{NONSE}}
+	\label{NONSEQ}
+\end{figure}

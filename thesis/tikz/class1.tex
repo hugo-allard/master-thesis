@@ -1,0 +1,90 @@
+\begin{figure}
+	\center
+	\begin{tikzpicture}
+		
+		\begin{umlpackage}{graph}
+		
+			\umlclass{Graph}{
+				\# states : State$[]$ \\ 
+				\# size : int
+			}{
+				+ addState(state : State) : void \\
+				+ getState(i : int) : State
+			}
+	
+			\umlclass[x=+5]{State}{
+				%\# id : int \\
+				%\# marked : boolean \\
+				%\# ingoing : List<Transition> \\
+				%\# outgoing : List<Transition>
+			}{
+				%\# addIngoing(in : Transition) : void \\
+				%\# addOutgoing(out : Transition) : void 
+			}
+
+			\umlclass[x=+10]{Transition}{
+					\# origin : State \\
+					\# destination : State
+			}{
+			}
+		\end{umlpackage}
+
+		\begin{umlpackage}[y=-6]{automata}
+
+			\umlclass{Automaton}{
+			}{
+				+ trim() : void
+			}
+			
+			\umlclass[x=+5]{AState}{
+				\# initial : boolean \\
+				\# accepting : boolean \\
+				\# accessible : boolean \\
+				\# coaccessible : boolean
+			}{
+			}
+			
+			\umlclass[x=+10]{ATransition}{
+				\# input : String
+			}{
+			}
+
+		\end{umlpackage}
+
+		\begin{umlpackage}[y=-12]{transducer}
+
+			\umlclass{Transducer}{
+			}{
+				+ square() : Transducer \\
+				+ isFunctionnal() : boolean \\
+				+ isSubsequential() : boolean \\
+				+ determinize() : Transducer
+			}
+
+			\umlclass[x=+5]{TState}{
+				\# output : String
+			}{
+			}
+			
+			\umlclass[x=+10]{TTransition}{
+				\# output : String
+			}{
+			}
+
+		\end{umlpackage}
+
+		\umlinherit[geometry=-|]{AState}{State}
+		\umlinherit[geometry=-|]{ATransition}{Transition}
+		\umlinherit[geometry=-|]{Automaton}{Graph}
+		\umlinherit[geometry=-|]{Transducer}{Automaton}
+		\umlinherit[geometry=-|]{TState}{AState}
+		\umlinherit[geometry=-|]{TTransition}{ATransition}
+		
+		\umlunicompo[geometry=-|, mult1=*, pos1=0.45, mult2=1, pos2=0, align2=left]{Graph}{State}
+		\umlassoc[geometry=-|-, mult1=*, pos1=0.2, mult2=1, pos2=3, align2=left]{Transition}{State}
+			
+	\end{tikzpicture}
+	
+	\caption{Diagramme de classe}
+	\label{CLASS1}	
+\end{figure}

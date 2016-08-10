@@ -1,0 +1,49 @@
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[%
+			>=stealth,
+			shorten >=1pt,
+			node distance=3cm,
+			on grid,
+			auto,
+			state/.append style={minimum size=2em},
+			thick,
+			inner sep=.2mm,
+			]
+
+		\node[state,initial,initial text={}]         (A)                    {$(q_0,q_0)$};
+        \node[state]                                 (B) [above right of=A] {$(q_1,q_1)$};
+        \node[state]                                 (C) [above right of=B] {$(q_2,q_2)$};
+        \node[state,dashed]                                 (D) [below right of=A] {$(q_1,q_3)$};
+        \node[state,dashed]                       			 (E) [below right of=D] {$(q_2,q_4)$};
+        \node[state]                       			 (F) [below left of=A]  {$(q_3,q_3)$};
+        \node[state,accepting]                       (G) [below left of=F]  {$(q_4,q_4)$};
+        \node[state,dashed]                       			 (H) [above left of=A]  {$(q_3,q_1)$};
+        \node[state,dashed]                       			 (I) [above left of=H]  {$(q_4,q_2)$};
+        \node[state,accepting]                       (J) [above right of=C]  {$(q_5,q_5)$};
+
+        \path[->]
+                (A) edge              node {$a/(b,b)$} (B)
+	                edge  [dashed]           node {$a/(b,ba)$} (D)
+	                edge              node {$a/(ba,ba)$} (F)
+	                edge     [dashed]     node {$a/(ba,b)$} (H)
+	                
+                (B) edge [bend left] node {$a/(\varepsilon,\varepsilon)$} (C)
+                (C) edge [bend left] node {$a/(\varepsilon,\varepsilon)$} (B)
+	                edge             node {$b/(ac,ac)$} (J)
+	                
+                (D) edge [bend left,dashed] node {$a/(\varepsilon,\varepsilon)$} (E)
+                (E) edge [bend left,dashed] node {$a/(\varepsilon,\varepsilon)$} (D)
+                
+                (F) edge [bend left] node {$a/(\varepsilon,\varepsilon)$} (G)
+                (G) edge [bend left] node {$a/(\varepsilon,\varepsilon)$} (F)
+                
+                (H) edge [bend left,dashed] node {$a/(\varepsilon,\varepsilon)$} (I)
+                (I) edge [bend left,dashed] node {$a/(\varepsilon,\varepsilon)$} (H)
+                
+                (J) edge [loop above] node {$a/a$} ();
+                
+\end{tikzpicture}
+	\caption{Partie accessible de $\mathscr{T}_1 \times \mathscr{T}_1$}
+	\label{ex3}
+\end{figure}

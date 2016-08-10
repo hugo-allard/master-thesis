@@ -1,0 +1,82 @@
+\frametitle{Transducteurs sous-séquentiels}
+\framesubtitle{}
+
+Déterminisation : étendre la construction des sous-ensembles
+
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[%
+	>=stealth,
+	shorten >=1pt,
+	node distance=1.8cm,
+	on grid,
+	auto,
+	state/.append style={fill=state, minimum size=1.2em, inner sep=0pt},
+	thick,
+	font=\scriptsize
+	]
+	
+	\node[state,initial,initial text={}]  (A) {$0$};
+	\node[state]                      (B) [right of=A] {$1$};
+	\node[state]             (C) [right of=B] {$2$};
+	\node[state]             (D) [below right of=A] {$3$};
+	\node[state,accepting]             (E) [right of=D] {$4$};
+	\node[state,accepting]             (F) [right of=C] {$5$};
+	
+	\path[->]
+	(A) edge  node {$a/b$} (B)
+		edge [bend left=50] node {$a/ba$} (C)
+		edge [swap] node {$a/ba$} (D)
+	
+	(B) edge [bend left=15]  node {$a/\varepsilon$} (C)
+	
+	(C) edge [bend left=15]  node {$a/\varepsilon$} (B)
+		edge  node {$b/ac$} (F)
+		
+	(D) edge [bend left=15]  node {$a/\varepsilon$} (E)
+	
+	(E) edge [bend left=15]  node {$a/\varepsilon$} (D)
+	
+	(F) edge [loop above] node {$a/a$} ();
+	
+	\end{tikzpicture}
+\end{figure}
+
+
+% EN CONSTRUCTION !!!!!!!!!!!
+
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[%
+	>=stealth,
+	shorten >=1pt,
+	node distance=2.2cm,
+	on grid,
+	auto,
+	state/.append style={fill=state, minimum size=1.5em, inner sep=2pt},
+	thick,
+	every text node part/.style={align=center},
+	font=\scriptsize
+	]
+	
+	\node[state,initial,initial text={}]  (A) {$0,\varepsilon$};
+	\node[state,onslide={<1> opacity=0}]                      (B) [right of=A] {$1,\varepsilon$ \\ $2,a$ \\ $3,a$};
+	\node[state,accepting,onslide={<1,2,3> opacity=0}]             (C) [right of=B] {$1,a$ \\ $2,\varepsilon$ \\ $4,a$};
+	\node[state,accepting,onslide={<1,2> opacity=0}]             (D) [above right of=B] {$5,\varepsilon$};
+	
+	\path[->]
+	(A) edge [onslide={<1> opacity=0}]  node {$a/b$} (B)
+	
+	(B) edge [bend left=15,onslide={<1,2,3> opacity=0}]  node {$a/\varepsilon$} (C)
+		edge [onslide={<1,2> opacity=0}]  node {$b/aac$} (D)
+	
+	(C) edge [bend left=15,onslide={<1,2,3,4,5> opacity=0}]  node {$a/\varepsilon$} (B)
+		edge [onslide={<1,2,3,4> opacity=0}]  node [swap] {$b/ac$} (D)
+		edge [onslide={<1,2,3,4,5,6> opacity=0}]  node [swap] {$a$} +(1,0)
+		
+	(D) edge [loop above,onslide={<1,2> opacity=0}] node {$a/a$} ();
+	
+	\end{tikzpicture}
+\end{figure}
+
+\only<7>{}

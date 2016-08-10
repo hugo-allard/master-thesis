@@ -1,0 +1,136 @@
+\begin{figure}
+	
+	\begin{minipage}[b]{0.5\linewidth}
+
+		\centering
+		\begin{tikzpicture}[%
+		>=stealth,
+		shorten >=1pt,
+		node distance=1.6cm,
+		on grid,
+		auto,
+		state/.append style={minimum size=2ex},
+		font=\scriptsize
+		]
+		
+		\tikzstyle{smallstate}=[state, style={minimum size=0.8em}]
+		
+		\node[state]    (A)				 {0};
+		\node[state,accepting]      			(B) [below right of=A] {0};
+		\node[state,dashed,inner sep=.5mm]      				(E) [right of=B] {-1};
+		\node[state,dashed,inner sep=.5mm]      				(F) [below of=B] {-1};
+		\node[state,dashed,inner sep=.5mm]      				(G) [below right=0.5cm and 0.5cm of E] {1};
+		\node[state,dashed,inner sep=.5mm]      				(H) [below right=0.5cm and 0.5cm of F] {1};
+		\node[state]      						(C) [right of=H] {0};
+		
+		\node[smallstate,initial,initial text={}]      			(A1) [above of=A] {};
+		\node[smallstate,accepting]      						(B1) [right of=A1] {};
+		\node[smallstate]      									(C1) [right of=B1] {};
+		
+		\node[smallstate,initial above,initial text={}]      	(A2) [left of=A] {};
+		\node[smallstate,accepting]      						(B2) [below of=A2] {};
+		\node[smallstate]      									(C2) [below of=B2] {};
+		
+		\path[->]
+		+(-0.7,0.7) edge (A)
+		(A) edge node [swap,sloped,pos=1] {$(x,x)$} (B)
+		edge [bend left=20] node [sloped,pos=0.1] {$(x^2,x^2)$}  (C)
+		edge [bend right=50,dashed] node [swap,pos=0.8] {$(x^2,x)$}  (F)
+		edge [bend left=70,dashed] node [pos=0.8] {$(x,x^2)$} (G)
+		
+		(B) edge [bend right=10] node {} (C)
+		
+		(C) edge [bend right=10] node {} (B)
+		
+		(E) edge [bend right=10,dashed] node {} (F)
+		
+		(F) edge [bend right=10,dashed] node {} (E)
+		
+		(G) edge [bend right=10,dashed] node {} (H)
+		
+		(H) edge [bend right=10,dashed] node {} (G)
+		
+		(A1) edge node [swap] {$a/x$} (B1)
+		edge [bend left=50] node {$a/x^2$}  (C1)
+		
+		(B1) edge [bend right=10] node [swap,sloped] {$a/x$} (C1)
+		
+		(C1) edge [bend right=10] node [swap,sloped] {$a/x$} (B1)
+		
+		(A2) edge node {$a/x$} (B2)
+		edge [bend right=55] node [swap] {$a/x^2$}  (C2)
+		
+		(B2) edge [bend right=10] node [swap] {$a/x$} (C2)
+		
+		(C2) edge [bend right=10] node [swap] {$a/x$} (B2);
+		
+		\end{tikzpicture}
+		
+		\captionof*{figure}{(a)}
+	\end{minipage}\quad%
+	\begin{minipage}[b]{0.5\linewidth}
+		
+		\centering
+		\begin{tikzpicture}[%
+		>=stealth,
+		shorten >=1pt,
+		node distance=1.7cm,
+		on grid,
+		auto,
+		state/.append style={minimum size=0.8em},
+		font=\scriptsize
+		]
+		
+		\tikzstyle{smallstate}=[state, style={minimum size=0.8em}]
+		
+		\node[state,inner sep=.3mm]      			(A)				 {$(\varepsilon,\varepsilon)$};
+		\node[state,accepting,inner sep=.3mm]      						(B) [below right of=A] {$(\varepsilon,\varepsilon)$};
+		\node[state,dashed]      						(E) [right of=B] {\textbf{0}};
+		\node[state,dashed]      						(F) [below of=B] {\textbf{0}};
+		\node[state,inner sep=.3mm]      									(C) [right of=F] {$(\varepsilon,\varepsilon)$};
+		
+		\node[smallstate,initial,initial text={}]      			(A1) [above of=A] {};
+		\node[smallstate,accepting]      						(B1) [right of=A1] {};
+		\node[smallstate]      						(C1) [right of=B1] {};
+		
+		\node[smallstate,initial above,initial text={}]      			(A2) [left of=A] {};
+		\node[smallstate,accepting]      						(B2) [below of=A2] {};
+		\node[smallstate]      						(C2) [below of=B2] {};
+		
+		\path[->]
+		+(-0.7,0.7) edge (A)
+		(A) edge node [swap,sloped,pos=1] {$(x,x)$} (B)
+		edge [bend left=25] node [sloped,pos=0.2] {$(y,y)$}  (C)
+		edge [bend left=50, dashed] node [pos=0.8] {$(y,x)$}  (E)
+		edge [bend right=50, dashed] node [swap,pos=0.8] {$(x,y)$} (F)
+		
+		(B) edge [bend right=10] node {} (C)
+		
+		(C) edge [bend right=10] node {} (B)
+		
+		(E) edge [bend right=10,dashed] node [swap,pos=0.8] {$(\varepsilon,\varepsilon)$} (F)
+		
+		(F) edge [bend right=10,dashed] node  {} (E)
+		
+		(A1) edge node [swap] {$a/x$} (B1)
+		edge [bend left=50] node {$a/y$}  (C1)
+		
+		(B1) edge [bend right=10] node [swap,sloped] {$a/\varepsilon$} (C1)
+		
+		(C1) edge [bend right=10] node [swap,sloped] {$a/\varepsilon$} (B1)
+		
+		(A2) edge node {$a/x$} (B2)
+		edge [bend right=55] node [swap] {$a/y$}  (C2)
+		
+		(B2) edge [bend right=10] node [swap] {$a/\varepsilon$} (C2)
+		
+		(C2) edge [bend right=10] node [swap] {$a/\varepsilon$} (B2);
+		
+		\end{tikzpicture}
+		\captionof*{figure}{(b)}
+		
+	\end{minipage}
+	
+	\caption{Deux transducteurs réalisant des fonctions sous-séquentielles. \cite{Bea03}}
+	\label{EXSUBSEQ}
+\end{figure}

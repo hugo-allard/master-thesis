@@ -1,0 +1,26 @@
+\begin{figure}
+		\centering
+		\begin{tikzpicture}[%
+			>=stealth,
+			shorten >=1pt,
+			node distance=3cm,
+			on grid,
+			auto,
+			state/.append style={fill=state, minimum size=2em},
+			thick
+		]
+		
+		\node[state,initial below,initial text={}] (A)		     {$q_0$};
+		\node[state,accepting] (B) [left of=A] {$q_2$};
+		\node[state] (C) [right of=A] {$q_1$};
+		
+		\path[->]
+		(A)    edge  node {\_$/\varepsilon$}  (B)
+				edge [bend left] node {\_/\_}	  (C)
+				edge [loop above] node {$a/a$}	  ()
+		(B)	   edge [loop above] node {\_$/\varepsilon$} ()
+		(C)	   edge [bend left] node {$a/a$}	  (A)
+		edge [loop above] node {\_$/\varepsilon$}	();
+		
+	\end{tikzpicture}
+\end{figure}

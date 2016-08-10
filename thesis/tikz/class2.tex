@@ -1,0 +1,19 @@
+\begin{figure}
+	\center
+	\begin{tikzpicture}
+	
+		\umlclass[x=+5]{State}{
+			\# id : int \\
+			\# marked : boolean \\
+			\# ingoing : List<Transition> \\
+			\# outgoing : List<Transition>
+		}{
+			\# addIngoing(in : Transition) : void \\
+			\# addOutgoing(out : Transition) : void 
+		}
+			
+	\end{tikzpicture}
+	
+	\caption{Classe \textbf{State}}
+	\label{CLASS2}	
+\end{figure}

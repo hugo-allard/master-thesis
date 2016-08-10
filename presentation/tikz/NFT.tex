@@ -1,0 +1,30 @@
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[%
+	>=stealth,
+	shorten >=1pt,
+	node distance=2.5cm,
+	on grid,
+	auto,
+	state/.append style={fill=state, minimum size=1.5em},
+	thick,
+	]
+	
+		\node[state,initial,initial text={},initial above]         (A)                    {$q_0$};
+		\node[state]                                 (B) [right of=A] {$q_1$};
+		\node[state,accepting]                                 (C) [right of=B] {$q_2$};
+		\node[state]                                 (D) [left of=A] {$q_3$};
+		\node[state,accepting]                       (E) [left of=D]       {$q_4$};
+		
+		\path[->]
+		(A) edge              node {$a/a$} (B)
+			edge              node [swap] {$a/a$} (D)
+		(B) edge [loop above] node {$b/\varepsilon$} ()
+			edge   			 node {$a/a$} (C)
+		(D) edge [loop above] node {$b/c$} ()
+			edge  node [swap] {$a/a$} (E);
+	
+	\end{tikzpicture}
+	
+	\label{NFT}
+\end{figure}

@@ -1,0 +1,31 @@
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[%
+	>=stealth,
+	shorten >=1pt,
+	node distance=2cm,
+	on grid,
+	auto,
+	state/.append style={fill=state, minimum size=1.5em},
+	thick,
+	]
+	
+	\node[state,initial,initial text={}]  (A) {$q_0$};
+	\node[state]                       (B) [right above of=A] {$q_1$};
+	\node[state,accepting]                       (C) [right below of=A] {$q_2$};
+	\node[state,accepting]                       (D) [right below of=B] {$q_3$};
+	
+	\path[->]
+	(A) edge  node {$a/b$} (B)
+
+	(B) edge [bend left=15]  node {$a/\varepsilon$} (C)
+		edge  node {$b/baac$} (D)
+		
+	(C) edge [bend left=15]  node {$a/\varepsilon$} (B)
+		edge  node {$b/ac$} (D)
+		edge  node {$ac$} +(1,0)
+		
+	(D) edge [loop above] node {$a/a$} ();
+	
+	\end{tikzpicture}
+\end{figure}

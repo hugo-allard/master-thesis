@@ -1,0 +1,14 @@
+\frametitle{Transducteurs fonctionnels}
+\framesubtitle{}
+
+\begin{block}{Définition (retard)}
+	On définit le retard entre $u$ et $v$ comme $delay(u,v) = (u',v')$ tel que 
+		\begin{itemize}
+			\item $u = lu'$, 
+			\item $v' = lv'$ et 
+			\item $l = lcp(u,v)$
+		\end{itemize}
+\end{block}
+\vspace{1cm}
+\centering
+Exemple: $delay(abbc, abc) = (bc, c)$.

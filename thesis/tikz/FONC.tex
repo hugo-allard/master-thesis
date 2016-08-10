@@ -1,0 +1,33 @@
+\begin{figure}
+	
+	\centering
+	\begin{tikzpicture}[%
+		>=stealth,
+		shorten >=1pt,
+		node distance=2.5cm,
+		on grid,
+		auto,
+		state/.append style={minimum size=1.5em}
+		]
+		
+		\node[state,initial,initial text={},accepting] 	(A1)				{$q_0$};
+		\node[state]									(B1) [right of=A1] 	{$q_1$};
+		\node[state]									(C1) [right of=B1]	{$q_2$};
+		\node[state,initial right,initial text={},accepting] 	(D1) [right of=C1]	{$q_3$};
+		
+		\path[->]
+		(A1) edge node [swap] {$a/x$} (B1)
+		edge [bend left] node [pos=0.8] {$a/x^3$} (C1)
+		
+		(B1) edge node [swap] {$a/x^4$} (C1)
+		edge [bend right = 45] node [swap] {$a/x^3$} (D1)
+		
+		(C1) edge node {$a/x$} (D1)
+		
+		(D1) edge [bend right=40] node [swap] {$a/x^2$} (A1);
+		
+	\end{tikzpicture}
+	
+	\caption{(\cite{Bea03}) Transducteur fonctionnel possédant un automate sous-jacent d'entrée ambigu.}
+	\label{FONC}
+\end{figure}

@@ -1,0 +1,29 @@
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[%
+		>=stealth,
+		shorten >=1pt,
+		node distance=3cm,
+		on grid,
+		auto,
+		state/.append style={fill=state, minimum size=2em},
+		thick
+		]
+		
+		\node[state,initial,initial text={}] (A)		     {$q_0$};
+		\node[state] (B) [right of=A] {$q_1$};
+		\node[state,accepting] (C) [right of=B] {$q_2$};
+		\node[state,accepting] (D) [right of=C] {$q_3$};
+		
+		\path[->]
+		(A)         edge [bend left]    node {$b$} 		 (B)
+		(A) 	   edge [loop above] node {$a$}		  ()
+		(B)	   edge [bend left] node {$a$}		  (A)
+		(B)	   edge 		 node {$b$} 		  (C)
+		(C)	   edge [loop above] node {$b$}		  ()
+		(C)	   edge [bend left]   node {$a$} 		  (D)
+		(D)	   edge [bend left]   node {$b$} 		  (C)
+		(D)	   edge [loop above] node {$a$}		  ();
+		
+	\end{tikzpicture}
+\end{figure}

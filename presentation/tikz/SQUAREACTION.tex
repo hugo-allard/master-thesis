@@ -1,0 +1,32 @@
+\begin{figure}
+		\centering
+		\begin{tikzpicture}[%
+			>=stealth,
+			shorten >=1pt,
+			node distance=2.5cm,
+			on grid,
+			auto,
+			state/.append style={fill=state, minimum size=2em, inner sep=0pt},
+			thick,
+			highlight/.style={fill=green},
+			edgelight/.style={draw=blue, text=blue},
+			every text node part/.style={align=center},
+			font=\scriptsize
+		]
+		
+		\node[state,initial,initial text={}] (A)		     {$0,0$ \\ $(\varepsilon, \varepsilon)$};
+		
+		\node[state,onslide={<2> highlight}] (B) [right of=A] {$1,5$ \\ $(\varepsilon, \varepsilon)$};
+		\node[state,onslide={<3> highlight}] (C) [right of=B] {$2,6$ \\ $(c, \varepsilon)$};
+		\node[state,onslide={<4> highlight}] (D) [right of=C] {$3,7$ \\ $(\varepsilon, a)$};
+		\node[state,accepting,onslide={<5> highlight}] (E) [right of=D] {$4,8$ \\ $(\varepsilon, \varepsilon)$};
+		
+		\path[->]
+		(A)    edge [onslide={<2> edgelight}] node {$a/(d,d)$} (B)
+			   
+		(B)	   edge [onslide={<3> edgelight}] node {$b/(c,\varepsilon)$} (C)
+		(C)	   edge [onslide={<4> edgelight}] node {$c/(b, cba)$}	(D)
+		(D)	   edge [onslide={<5> edgelight}] node {$d/(a,\varepsilon)$}	(E);
+		
+	\end{tikzpicture}
+\end{figure}

@@ -1,0 +1,31 @@
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[%
+			>=stealth,
+			shorten >=1pt,
+			node distance=2.5cm,
+			on grid,
+			auto,
+			state/.append style={minimum size=2em},
+			thick,
+			inner sep=.2mm,
+			]
+
+		\node[state,initial,initial text={}]         (A)                    {$0$};
+        \node[state]                                 (B) [above right of=A] {$1$};
+        \node[state]                                 (C) [above right of=B] {$2$};
+        \node[state,accepting]                       (J) [above right of=C] {$5$};
+
+        \path[->]
+                (A) edge              node {$a/(b,b)$} (B)
+	                
+                (B) edge [bend left] node {$a/(\varepsilon,\varepsilon)$} (C)
+                (C) edge [bend left] node {$a/(\varepsilon,\varepsilon)$} (B)
+	                edge             node {$b/(ac,ac)$} (J)
+                
+                (J) edge [loop above] node {$a/a$} ();
+                
+\end{tikzpicture}
+	\caption{Calcul de $\mathscr{V'}$ pour $\mathscr{T}_1 \times \mathscr{T}_1$}
+	\label{ex5}
+\end{figure}
