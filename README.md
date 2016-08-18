@@ -1,10 +1,10 @@
 # master-thesis
 
-## code
+##### code
 Contains the source code of the thesis.
 
-## presentation
+##### presentation
 Contains the beamer presentation of the thesis.
 
-## thesis
+##### thesis
 Contains the Latex source of the thesis.
